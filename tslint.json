@@ -6,7 +6,7 @@
         "cyclomatic-complexity": true,
         "deprecation": true,
         "max-line-length": {
-            "options": [180]
+            "options": [-1]
         },
         "no-bitwise": false,
         "no-console": false,

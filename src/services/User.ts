@@ -55,16 +55,18 @@ export default class User {
         ]);
     }
 
-    public async uploadFile(userID: string, fileBuffer: Buffer, fileType: string) {
+    public async uploadFile(userID: string, fileBuffer: Buffer, fileType: string, fileName: string) {
         const fileID = await this.db.files().select('id').where({ 'user_id': userID, 'type': fileType }).first();
         if (fileID) {
-            await this.db.files().where({ 'id': fileID.id }).update({'file': fileBuffer});
+            await this.db.files().where({ 'id': fileID.id }).update({'file': fileBuffer, 'created': new Date(), 'file_name': fileName});
 
             return;
         }
 
         const fileData: database.files = {
+            'created': new Date(),
             'file': fileBuffer,
+            'file_name': fileName,
             'id': generateID(16),
             'type': fileType,
             'user_id': userID,
@@ -154,7 +156,7 @@ export default class User {
         ]);
     }
 
-    public async uploadRecommendationLetter(userID: string, recommendationID: string, recommendationBuffer: Buffer) {
+    public async uploadRecommendationLetter(userID: string, recommendationID: string, recommendationBuffer: Buffer, fileName: string) {
         const user = await this.db.users().select('recommendations', 'email').where({'id': userID}).first();
         const recommendations = user.recommendations;
         let uploaderEmail = '';
@@ -163,11 +165,14 @@ export default class User {
             if (element.id === recommendationID) {
                 recommendations[index].received = true;
                 uploaderEmail = recommendations[index].email;
+                delete recommendations[index].send_date;
             }
         });
 
         const fileData: database.files = {
+            'created': new Date(),
             'file': recommendationBuffer,
+            'file_name': fileName,
             'id': generateID(16),
             'type': 'recommendation',
             'user_id': userID,
@@ -189,7 +194,7 @@ export default class User {
             sendMail(user.email, 'Rekommendationsbrev mottaget', bodyUser),
 
             sendMail(uploaderEmail, 'Rekommendationsbrev mottaget', body,
-            [{'filename': 'rekommendationsbrev.pdf', 'content': recommendationBuffer}]),
+            [{'filename': fileName, 'content': recommendationBuffer}]),
         ]);
     }
 

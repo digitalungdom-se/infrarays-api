@@ -1,6 +1,7 @@
 import knex from 'knex';
 
-import database from 'types/database';
+import { Optional } from 'express-validator/src/context';
+import database, { files } from 'types/database';
 
 export default class Server {
     private knex: knex;
@@ -41,5 +42,18 @@ export default class Server {
 
     public async getTokenByIDAndType(token: string, type: string): Promise<database.tokens> {
         return this.db.tokens().select().where({ 'id': token, type }).first();
+    }
+
+    public async getFilesByUserID(userID: string, options?: { returnBuffer?: boolean, returnRecommendations?: boolean }): Promise<Array<{type: string, file: Buffer, created: Date, file_name: string}>> {
+        options = options || {};
+        const columns = ['type', 'created', 'file_name'];
+        const whereNot = options.returnRecommendations ? {} : {'type': 'recommendation'};
+        if (options.returnBuffer) {
+            columns.push('file');
+        }
+
+        const fileArray = await this.db.files().select(columns).where({'user_id': userID}).whereNot(whereNot);
+
+        return fileArray as Array<files>;
     }
 }

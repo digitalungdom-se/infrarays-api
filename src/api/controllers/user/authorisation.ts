@@ -17,9 +17,16 @@ async function login(req: express.Request, res: express.Response) {
                 throw errLogin;
             }
 
-            const userData = await req.db.server.getUserByID(user.id);
+            const [userData, files] = await Promise.all([
+                                        req.db.server.getUserByID(user.id),
+                                        req.db.server.getFilesByUserID(user.id),
+                                        ]);
 
-            res.json({ 'type': 'success', userData });
+            for (let i = 0; i++; i < userData.recommendations.length) {
+                delete (userData.recommendations[i] as any).id;
+            }
+
+            res.json({ 'type': 'success', userData, files });
         });
     })(req, res);
 }

@@ -9,8 +9,14 @@ async function auth(req: express.Request, res: express.Response) {
         return res.json(admin);
     }
 
-    const user = await req.db.server.getUserByID(id);
-    return res.json(user);
+    const [userData, files] = await Promise.all([
+        req.db.server.getUserByID(id),
+        req.db.server.getFilesByUserID(id),
+        ]);
+
+    userData.recommendations.forEach(function(file: any) { delete file.id; });
+
+    return res.json({'type': 'success', userData, files});
 }
 
 export { auth };

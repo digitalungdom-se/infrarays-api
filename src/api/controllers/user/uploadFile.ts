@@ -4,11 +4,10 @@ import fileUpload from 'express-fileupload';
 async function uploadPDF(req: express.Request, res: express.Response) {
     const userID = req.user?.id || '';
     const fileType = req.params.fileType;
-    const file = req.files?.file as fileUpload.UploadedFile;
+    const fileBuffer = (req.files?.file as fileUpload.UploadedFile).data;
+    const fileName = (req.files?.file as fileUpload.UploadedFile).name;
 
-    const fileBuffer = file.data;
-
-    await req.db.user.uploadFile(userID, fileBuffer, fileType);
+    await req.db.user.uploadFile(userID, fileBuffer, fileType, fileName);
 
     return res.status(201).json({ 'type': 'success' });
 }

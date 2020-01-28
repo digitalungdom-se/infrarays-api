@@ -13,8 +13,9 @@ async function uploadRecommendationLetter(req: express.Request, res: express.Res
     const userID = req.params.userID;
     const recommendationID = req.params.recommendationID;
     const recommendationBuffer = (req.files?.file as fileUpload.UploadedFile).data;
+    const recommendationName = (req.files?.file as fileUpload.UploadedFile).name;
 
-    await req.db.user.uploadRecommendationLetter(userID, recommendationID, recommendationBuffer);
+    await req.db.user.uploadRecommendationLetter(userID, recommendationID, recommendationBuffer, recommendationName);
 
     return res.status(201).json({'type': 'success'});
 }

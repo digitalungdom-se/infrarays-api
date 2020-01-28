@@ -9,7 +9,10 @@ export async function up(knex: Knex): Promise<any> {
 
         table.string('type', 16).notNullable();
 
-        table.binary('file');
+        table.dateTime('created').notNullable();
+        table.string('file_name', 255).notNullable();
+
+        table.binary('file').notNullable();
     });
 }
 

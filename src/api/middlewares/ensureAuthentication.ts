@@ -24,7 +24,7 @@ async function ensureAdminAuthenticated(req: express.Request, _: express.Respons
 
 }
 
-async function ensureAuthenticated(req: express.Request, _: express.Response, next: express.NextFunction) {
+function ensureAuthenticated(req: express.Request, _: express.Response, next: express.NextFunction) {
     if (req.isAuthenticated()) {
         return next();
     }
@@ -33,7 +33,6 @@ async function ensureAuthenticated(req: express.Request, _: express.Response, ne
     err.statusCode = 401;
     err.customMessage = 'UNATHORISED';
     next(err);
-
 }
 
 export { ensureUserAuthenticated, ensureAdminAuthenticated, ensureAuthenticated };

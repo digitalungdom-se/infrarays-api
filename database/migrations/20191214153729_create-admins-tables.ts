@@ -10,7 +10,7 @@ export async function up(knex: Knex): Promise<any> {
 
         table.string('name', 64).notNullable();
 
-        table.boolean('super_admin');
+        table.boolean('super_admin').notNullable();
     });
 }
 
