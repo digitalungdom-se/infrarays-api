@@ -1,0 +1,23 @@
+{
+    "extends": "tslint:recommended",
+    "rules": {
+        "array-type": [true, "generic"],
+        "class-name": true,
+        "cyclomatic-complexity": true,
+        "deprecation": true,
+        "max-line-length": {
+            "options": [180]
+        },
+        "no-bitwise": false,
+        "no-console": false,
+        "no-floating-promises": true,
+        "no-return-await": true,
+        "no-string-literal": true,
+        "object-literal-key-quotes": [true, "always"],
+        "only-arrow-functions": false,
+        "quotemark": [true, "single"],
+        "semicolon": [true, "always"],
+        "space-within-parens": true,
+        "unnecessary-else": true
+    }
+}

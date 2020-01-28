@@ -1,0 +1,29 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "module": "commonjs",
+
+        "moduleResolution": "node",
+        "sourceMap": true,
+        "outDir": "./build/",
+
+        "baseUrl": "src",
+        "paths": { "*": ["*"] },
+
+        "noImplicitReturns": true,
+        "noImplicitThis": true,
+        "noImplicitAny": true,
+        "strictNullChecks": true,
+        "esModuleInterop": true,
+
+        "allowJs": false,
+
+        "plugins": [{
+            "transform": "@zerollup/ts-transform-paths"
+        }]
+    },
+
+    "include": [
+        "src/**/*"
+    ]
+}
