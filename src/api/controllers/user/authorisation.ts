@@ -22,9 +22,9 @@ async function login(req: express.Request, res: express.Response) {
                                         req.db.server.getFilesByUserID(user.id),
                                         ]);
 
-            for (let i = 0; i++; i < userData.recommendations.length) {
-                delete (userData.recommendations[i] as any).id;
-            }
+            userData.recommendations.forEach(function(file: any) { delete file.id; });
+            delete userData.id;
+            delete userData.password;
 
             res.json({ 'type': 'success', userData, files });
         });

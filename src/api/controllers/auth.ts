@@ -15,6 +15,8 @@ async function auth(req: express.Request, res: express.Response) {
         ]);
 
     userData.recommendations.forEach(function(file: any) { delete file.id; });
+    delete userData.id;
+    delete userData.password;
 
     return res.json({'type': 'success', userData, files});
 }
