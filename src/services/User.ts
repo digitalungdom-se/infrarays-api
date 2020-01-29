@@ -102,7 +102,7 @@ export default class User {
         const recommendationLetters: Array<string> = [];
 
         for (const letter of user.recommendations) {
-            if (letter.file_id) { recommendationLetters.push(letter.email); }
+            if (letter.received) { recommendationLetters.push(letter.email); }
         }
 
         const coverPage = await generateCoverPage(user, recommendationLetters, files);
