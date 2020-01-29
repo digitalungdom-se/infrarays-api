@@ -3,7 +3,8 @@ import { body } from 'express-validator';
 const login = [
     body('username')
         .isString()
-        .isEmail(),
+        .isEmail()
+        .normalizeEmail(),
 
     body('password')
         .isString()
