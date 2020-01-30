@@ -2,7 +2,7 @@ import passport from 'configs/passport';
 import express from 'express';
 
 async function login(req: express.Request, res: express.Response) {
-    passport.authenticate('local.user', function(err, user: Express.User, info) {
+    passport.authenticate('local.user', function(err, user: {id: string, type: 'user'}, info) {
         if (err) {
             throw err;
         }

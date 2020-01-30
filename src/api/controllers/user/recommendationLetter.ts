@@ -3,7 +3,7 @@ import fileUpload from 'express-fileupload';
 
 async function sendRecommendationEmail(req: express.Request, res: express.Response) {
     const id = req.user?.id || '';
-    const email = req.body.email;
+    const email = req.body.newEmail ? req.body.newEmail : req.body.email;
     await req.db.user.sendRecommendationEmail(id, email);
 
     return res.json({'type': 'success'});

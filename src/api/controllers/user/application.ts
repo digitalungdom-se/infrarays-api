@@ -21,9 +21,9 @@ async function downloadApplication(req: express.Request, res: express.Response) 
 }
 
 async function deleteApplication(req: express.Request, res: express.Response) {
-    const id = req.user?.id || '';
+    const userID = req.user?.id || '';
 
-    await req.db.user.deleteApplication(id);
+    await req.db.user.deleteApplication(userID);
 
     req.logout();
 

@@ -5,9 +5,9 @@ async function ensureUserAuthenticated(req: express.Request, _: express.Response
         return next();
     }
 
-    const err: Express.RequestError = new Error('UNATHORISED');
+    const err: Express.RequestError = new Error('UNAUTHORISED');
     err.statusCode = 401;
-    err.customMessage = 'UNATHORISED';
+    err.customMessage = 'UNAUTHORISED';
     next(err);
 
 }
@@ -17,9 +17,9 @@ async function ensureAdminAuthenticated(req: express.Request, _: express.Respons
         return next();
     }
 
-    const err: Express.RequestError = new Error('UNATHORISED');
+    const err: Express.RequestError = new Error('UNAUTHORISED');
     err.statusCode = 401;
-    err.customMessage = 'UNATHORISED';
+    err.customMessage = 'UNAUTHORISED';
     next(err);
 
 }
@@ -29,9 +29,9 @@ function ensureAuthenticated(req: express.Request, _: express.Response, next: ex
         return next();
     }
 
-    const err: Express.RequestError = new Error('UNATHORISED');
+    const err: Express.RequestError = new Error('UNAUTHORISED');
     err.statusCode = 401;
-    err.customMessage = 'UNATHORISED';
+    err.customMessage = 'UNAUTHORISED';
     next(err);
 }
 

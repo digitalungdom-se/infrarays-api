@@ -50,9 +50,10 @@ export default class User {
 
         await Promise.all([
             this.db.users().insert(user),
-            this.db.tokens().insert({'id': token, 'type': 'verify_email', 'user_id': userID}),
             sendMail(userData.email, 'Verifiera din din e-postadress', body),
         ]);
+
+        await this.db.tokens().insert({'id': token, 'type': 'verify_email', 'user_id': userID});
     }
 
     public async uploadFile(userID: string, fileBuffer: Buffer, fileType: string, fileName: string) {
@@ -77,8 +78,8 @@ export default class User {
 
     public async deleteApplication(userID: string) {
         const [user, email] = await Promise.all([
-            this.db.users().select('email').where({'id': userID}),
-            this.db.emails().select('content').where({'type': 'delete_confirmation'}),
+            this.db.users().select('email').where({'id': userID}).first(),
+            this.db.emails().select('content').where({'type': 'delete_confirmation'}).first(),
         ]);
 
         const templateData = (email).content;
@@ -198,12 +199,14 @@ export default class User {
         ]);
     }
 
-    public async verify(token: string) {
+    public async verify(token: string): Promise<string> {
         const verification = await this.db.tokens().select('user_id').where({'id': token, 'type': 'verify_email'}).first();
 
         await this.db.users().update({'verified': true}).where({'id': verification.user_id});
 
         await this.db.tokens().del().where({'id': token, 'type': 'verify_email'});
+
+        return verification.user_id;
     }
 
     public async sendForgotPassword(email: string) {

@@ -1,3 +1,4 @@
+import knex from 'knex';
 import config from './index';
 
 interface IKnexConfig {
@@ -11,7 +12,13 @@ const knexConfig: IKnexConfig = {
     'development': {
         'client': 'pg',
         'connection': config.databaseURI,
-        'pool': { 'min': 0, 'max': 10 },
+        'pool': { 'max': 10, 'min': 0,
+            'afterCreate'(connection: any, callback: any) {
+                connection.query('SET TIME ZONE \'UTC\';', function(err: Error) {
+                    callback(err, connection);
+                    });
+                },
+            },
         'useNullAsDefault': true,
 
         'migrations': {
@@ -22,7 +29,13 @@ const knexConfig: IKnexConfig = {
     'production': {
         'client': 'pg',
         'connection': config.databaseURI,
-        'pool': { 'min': 0, 'max': 10 },
+        'pool': { 'max': 10, 'min': 0,
+            'afterCreate'(connection: any, callback: any) {
+                connection.query('SET TIME ZONE \'UTC\';', function(err: Error) {
+                    callback(err, connection);
+                    });
+                },
+    },
         'useNullAsDefault': true,
 
         'migrations': {
