@@ -4,8 +4,6 @@ import Hogan from 'hogan.js';
 import knex from 'knex';
 import pdfjs from 'pdfjs';
 
-import fs from 'fs';
-
 import { generateCoverPage, generateID, sendMail } from 'utils';
 
 import database from 'types/database';
@@ -109,7 +107,7 @@ export default class User {
         }
 
         const coverLetterEssay: any = {};
-        files.forEach(function(file: any) {
+        files.forEach(function (file: any) {
             if (file.type === 'coverLetter' || file.type === 'essay') {
                 coverLetterEssay[file.type] = file.file;
             }
@@ -135,20 +133,27 @@ export default class User {
         return doc.asBuffer();
     }
 
-    public async sendRecommendationEmail(userID: string, email: string) {
+    public async sendRecommendationEmail(userID: string, email: string, newEmail?: string) {
         const user = await this.db.users().select('recommendations', 'name', 'id').where({ 'id': userID }).first();
         const recommendations = user.recommendations;
 
-        const index = recommendations.findIndex(function(element: any) {
+        const index = recommendations.findIndex(function (element: any) {
             if (element.email === email) {
                 return true;
             }
             return false;
         });
+
         let id = '';
         if (index > -1) {
             recommendations[index].send_date = new Date();
-            id = recommendations[index].id;
+
+            if (!newEmail) {
+                id = recommendations[index].id;
+            } else {
+                recommendations[index].id = generateID(16);
+                recommendations[index].email = newEmail;
+            }
         } else {
             id = generateID(16);
             recommendations.push({ id, email, 'send_date': new Date(), 'received': false });
@@ -171,7 +176,7 @@ export default class User {
         const recommendations = user.recommendations;
         let uploaderEmail = '';
 
-        recommendations.forEach(function(element: any, index: number) {
+        recommendations.forEach(function (element: any, index: number) {
             if (element.id === recommendationID) {
                 recommendations[index].received = true;
                 uploaderEmail = recommendations[index].email;
@@ -224,14 +229,24 @@ export default class User {
         const token = generateID(16);
         const tokenHash = await hasha.async(token, { 'encoding': 'base64' });
 
-        const templateData = (await this.db.emails().select('content').where({ 'type': 'reset_password' }).first()).content;
+        const [templateDataRow, tokenExists] = await Promise.all([
+            this.db.emails().select('content').where({ 'type': 'reset_password' }).first(),
+            this.db.tokens().select('id').where({ 'user_id': userID, 'type': 'reset_password' }).first()
+        ]);
+
+        const templateData = templateDataRow.content;
         const template = Hogan.compile(templateData);
         const body = template.render({ token });
 
-        await Promise.all([
-            this.db.tokens().insert({ 'id': tokenHash, 'type': 'reset_password', 'user_id': userID }),
-            sendMail(email, 'Återställ lösenord', body),
-        ]);
+        const promiseArray: any = [sendMail(email, 'Återställ lösenord', body)];
+
+        if (tokenExists) {
+            promiseArray.push(this.db.tokens().update({ 'id': tokenHash }).where({ 'user_id': userID, 'type': 'reset_password' }));
+        } else {
+            promiseArray.push(this.db.tokens().insert({ 'id': tokenHash, 'type': 'reset_password', 'user_id': userID }));
+        }
+
+        await Promise.all(promiseArray);
     }
 
     public async resetPassword(token: string, password: string) {

@@ -4,7 +4,7 @@ import LocalStrategy from 'passport-local';
 
 // Simple passportjs local strategy
 passport.use('local.admin', new LocalStrategy.Strategy({ 'passReqToCallback': true },
-    async function(req, email, password, done) {
+    async function (req, email, password, done) {
         const adminData = await req.db.server.getAdminByEmail(email);
         if (!adminData) {
             return done(null, false, { 'message': 'no user' });
@@ -24,19 +24,19 @@ passport.use('local.admin', new LocalStrategy.Strategy({ 'passReqToCallback': tr
 
 // Simple passportjs local strategy
 passport.use('local.user', new LocalStrategy.Strategy({ 'passReqToCallback': true },
-    async function(req, email, password, done) {
+    async function (req, email, password, done) {
         const userData = await req.db.server.getUserByEmail(email);
 
         if (!userData) {
             return done(null, false, { 'message': 'no user' });
         }
 
-        if (!userData.verified) {
-            return done(null, false, { 'message': 'not verified' });
-        }
-
         if (!await bcrypt.compare(password, userData.password)) {
             return done(null, false, { 'message': 'incorrect password' });
+        }
+
+        if (!userData.verified) {
+            return done(null, false, { 'message': 'not verified' });
         }
 
         const user = {
@@ -48,11 +48,11 @@ passport.use('local.user', new LocalStrategy.Strategy({ 'passReqToCallback': tru
     },
 ));
 
-passport.serializeUser(function(user, done) {
+passport.serializeUser(function (user, done) {
     done(null, user);
 });
 
-passport.deserializeUser(function(user, done) {
+passport.deserializeUser(function (user, done) {
     done(null, user);
 });
 

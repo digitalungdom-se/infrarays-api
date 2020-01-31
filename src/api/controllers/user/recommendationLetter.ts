@@ -3,10 +3,12 @@ import fileUpload from 'express-fileupload';
 
 async function sendRecommendationEmail(req: express.Request, res: express.Response) {
     const id = req.user?.id || '';
-    const email = req.body.newEmail ? req.body.newEmail : req.body.email;
-    await req.db.user.sendRecommendationEmail(id, email);
+    const email = req.body.email;
+    const newEmail = req.body.newEmail;
 
-    return res.json({'type': 'success'});
+    await req.db.user.sendRecommendationEmail(id, email, newEmail);
+
+    return res.json({ 'type': 'success' });
 }
 
 async function uploadRecommendationLetter(req: express.Request, res: express.Response) {
@@ -17,7 +19,7 @@ async function uploadRecommendationLetter(req: express.Request, res: express.Res
 
     await req.db.user.uploadRecommendationLetter(userID, recommendationID, recommendationBuffer, recommendationName);
 
-    return res.status(201).json({'type': 'success'});
+    return res.status(201).json({ 'type': 'success' });
 }
 
 export {
