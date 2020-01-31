@@ -109,7 +109,7 @@ export default class User {
         }
 
         const coverLetterEssay: any = {};
-        files.forEach(function (file: any) {
+        files.forEach(function(file: any) {
             if (file.type === 'coverLetter' || file.type === 'essay') {
                 coverLetterEssay[file.type] = file.file;
             }
@@ -139,7 +139,7 @@ export default class User {
         const user = await this.db.users().select('recommendations', 'name', 'id').where({ 'id': userID }).first();
         const recommendations = user.recommendations;
 
-        const index = recommendations.findIndex(function (element: any) {
+        const index = recommendations.findIndex(function(element: any) {
             if (element.email === email) {
                 return true;
             }
@@ -171,7 +171,7 @@ export default class User {
         const recommendations = user.recommendations;
         let uploaderEmail = '';
 
-        recommendations.forEach(function (element: any, index: number) {
+        recommendations.forEach(function(element: any, index: number) {
             if (element.id === recommendationID) {
                 recommendations[index].received = true;
                 uploaderEmail = recommendations[index].email;
