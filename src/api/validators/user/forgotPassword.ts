@@ -6,7 +6,8 @@ const sendForgotPassword = [
     body('email')
         .isString()
         .isEmail()
-        .custom(async function(email: string, meta) {
+        .normalizeEmail()
+        .custom(async function (email: string, meta) {
             const req = meta.req as unknown as express.Request;
 
             const user = await req.db.server.getUserByEmail(email);
@@ -20,15 +21,14 @@ const sendForgotPassword = [
             }
 
             return true;
-        })
-        .normalizeEmail(),
+        }),
 ];
 
 const resetPassword = [
     body('token')
         .isString()
         .isLength({ 'min': 16, 'max': 16 })
-        .custom(async function(token: string, meta) {
+        .custom(async function (token: string, meta) {
             const req = meta.req as unknown as express.Request;
             const tokenHash = await hasha.async(token, { 'encoding': 'base64' });
 

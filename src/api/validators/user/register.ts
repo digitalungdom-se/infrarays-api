@@ -5,7 +5,8 @@ const register = [
     body('email')
         .isString()
         .isEmail()
-        .custom(async function(email, meta) {
+        .normalizeEmail()
+        .custom(async function (email, meta) {
             const req = meta.req as unknown as express.Request;
 
             const emailExists = await req.db.server.getUserByEmail(email);
@@ -14,8 +15,7 @@ const register = [
             }
 
             return true;
-        })
-        .normalizeEmail(),
+        }),
 
     body('password')
         .isString()
@@ -24,7 +24,7 @@ const register = [
     body('name')
         .isString()
         .isLength({ 'min': 3, 'max': 256 })
-        .customSanitizer(function(name: string) {
+        .customSanitizer(function (name: string) {
             return name.toLowerCase();
         }),
 

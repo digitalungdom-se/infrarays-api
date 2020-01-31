@@ -1,5 +1,5 @@
 import express from 'express';
-import { body , param} from 'express-validator';
+import { body, param } from 'express-validator';
 import fileType from 'file-type';
 import moment from 'moment';
 
@@ -7,7 +7,8 @@ const sendRecommendationEmail = [
     body('email')
         .isString()
         .isEmail()
-        .custom(async function(email, meta) {
+        .normalizeEmail()
+        .custom(async function (email, meta) {
             const req = meta.req as unknown as express.Request;
 
             const id = req.user?.id || '';
@@ -18,7 +19,7 @@ const sendRecommendationEmail = [
                     throw new Error('too many');
                 }
 
-                const found = user.recommendations.find(function(element: any) {
+                const found = user.recommendations.find(function (element: any) {
                     return element.email === email;
                 });
 
@@ -27,7 +28,7 @@ const sendRecommendationEmail = [
                 }
             }
 
-            const foundNotValid = user.recommendations.find(function(element: any) {
+            const foundNotValid = user.recommendations.find(function (element: any) {
                 const nextSendDate = moment.utc(element.send_date).add(1, 'day');
 
                 if (element.email === email && (element.received || nextSendDate.isAfter(moment.utc()))) {
@@ -40,18 +41,19 @@ const sendRecommendationEmail = [
             if (foundNotValid) {
                 throw new Error('too fast');
             }
-        })
-        .normalizeEmail(),
+        }),
 
-        body('newEmail')
+    body('newEmail')
         .optional()
-        .custom(async function(email, meta) {
+        .isEmail()
+        .normalizeEmail()
+        .custom(async function (email, meta) {
             const req = meta.req as unknown as express.Request;
 
             const id = req.user?.id || '';
             const user = await req.db.server.getUserByID(id);
 
-            const foundNotValid = user.recommendations.find(function(element: any) {
+            const foundNotValid = user.recommendations.find(function (element: any) {
                 if (element.email === email) {
                     return true;
                 }
@@ -62,23 +64,21 @@ const sendRecommendationEmail = [
             if (foundNotValid) {
                 throw new Error('already sent');
             }
-        })
-        .isEmail()
-        .normalizeEmail(),
+        }),
 ];
 
 const uploadRecommendationLetter = [
     param('recommendationID')
-    .isString(),
+        .isString(),
 
     param('userID')
         .isString()
-        .custom(async function(userID: string, meta) {
+        .custom(async function (userID: string, meta) {
             const req = meta.req as unknown as express.Request;
 
             const recommendations = (await req.db.server.getUserByID(userID)).recommendations;
 
-            const found = recommendations.find(function(value: any) {
+            const found = recommendations.find(function (value: any) {
                 if (value.id === req.params.recommendationID && !value.received) {
                     return true;
                 }
@@ -90,7 +90,7 @@ const uploadRecommendationLetter = [
 
             return true;
         })
-        .custom(async function(_, { req }) {
+        .custom(async function (_, { req }) {
             const file = req.files.file;
 
             if (!file || !file.data) {
