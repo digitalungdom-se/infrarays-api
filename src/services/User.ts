@@ -198,7 +198,7 @@ export default class User {
             'created': new Date(),
             'file': recommendationBuffer,
             'file_name': fileName,
-            'id': generateID(16),
+            'id': recommendationID,
             'type': 'recommendation',
             'user_id': userID,
         };
@@ -269,6 +269,20 @@ export default class User {
         await this.db.tokens().del().where({ 'id': tokenHash, 'type': 'reset_password' });
 
         return userID;
+    }
+
+    public async getRecommendationInfo(userID: string, recommendationID: string): Promise<{ name: string, fileName?: string, received: boolean, uploaded?: Date; }> {
+        const [user, file] = await Promise.all([
+            this.db.users().select('name').where({ 'id': userID }).first(),
+            this.db.files().select('file_name', 'created').where({ 'id': recommendationID }).first()
+        ]);
+
+        if (file) {
+            return { 'name': user.name, 'fileName': file.file_name, 'received': true, 'uploaded': file.created };
+        }
+
+        return { 'name': user.name, 'received': false };
+
     }
 
     public async updateSurvey(userID: string, surveyData: Omit<database.surveys, 'id' | 'user_id'>) {

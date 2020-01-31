@@ -5,9 +5,10 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
 import fileUpload from 'express-fileupload';
-import session from 'express-session';
 import helmet from 'helmet';
 import passport from 'passport';
+import path from 'path';
+import session from 'express-session';
 
 import AdminService from 'services/Admin';
 import ServerService from 'services/Server';
@@ -32,6 +33,9 @@ export default async function init(state: string): Promise<express.Application> 
     // Middleware
     // Compression
     app.use(compression());
+
+    app.use(express.static(path.join(__dirname, '..', 'build')));
+
 
     // Security
     // Helmet
@@ -95,10 +99,14 @@ export default async function init(state: string): Promise<express.Application> 
     // Use routes defined in routes/routes.js
     app.use('/api/', apiRoutes);
 
-    app.all('*', function (req, res, next: express.NextFunction) {
+    app.all('/api/*', function (req, res, next: express.NextFunction) {
         const err: Express.RequestError = new Error('NOT_FOUND');
         err.statusCode = 404;
         next(err);
+    });
+
+    app.get('*', function (req, res) {
+        res.sendFile(path.join(__dirname, '..', 'build', 'index.html'));
     });
 
     // Error logger

@@ -27,6 +27,8 @@ router.post('/user/verify', validate(validators.user.verify), controllers.user.v
 
 router.post('/user/send/recommendation', validate(validators.user.sendRecommendationEmail), controllers.user.sendRecommendationEmail);
 router.post('/user/upload/recommendation/:userID/:recommendationID', validate(validators.user.uploadRecommendationLetter), controllers.user.uploadRecommendationLetter);
+router.get('/user/recommendation', validate(validators.user.getRecommendationInfo), controllers.user.getRecommendationInfo);
+
 
 router.post('/user/upload/pdf/:fileType', ensureUserAuthenticated, validate(validators.user.uploadPDF), controllers.user.uploadPDF);
 

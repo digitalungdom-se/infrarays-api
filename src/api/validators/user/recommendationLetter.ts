@@ -1,5 +1,5 @@
 import express from 'express';
-import { body, param } from 'express-validator';
+import { body, param, query } from 'express-validator';
 import fileType from 'file-type';
 import moment from 'moment';
 
@@ -67,6 +67,35 @@ const sendRecommendationEmail = [
         }),
 ];
 
+const getRecommendationInfo = [
+    query('recommendationID')
+        .isString(),
+
+    query('userID')
+        .isString()
+        .custom(async function (userID: string, meta) {
+            const req = meta.req as unknown as express.Request;
+
+            const user = await req.db.server.getUserByID(userID);
+
+            if (!user) {
+                throw new Error('no user');
+            }
+
+            const found = user.recommendations.find(function (value: any) {
+                if (value.id === req.query.recommendationID) {
+                    return true;
+                }
+
+                return false;
+            });
+
+            if (!found) { throw new Error('no recommendation'); }
+
+            return true;
+        })
+];
+
 const uploadRecommendationLetter = [
     param('recommendationID')
         .isString(),
@@ -76,9 +105,14 @@ const uploadRecommendationLetter = [
         .custom(async function (userID: string, meta) {
             const req = meta.req as unknown as express.Request;
 
-            const recommendations = (await req.db.server.getUserByID(userID)).recommendations;
+            const user = await req.db.server.getUserByID(userID);
 
-            const found = recommendations.find(function (value: any) {
+            if (!user) {
+                throw new Error('no user');
+            }
+
+
+            const found = user.recommendations.find(function (value: any) {
                 if (value.id === req.params.recommendationID && !value.received) {
                     return true;
                 }
@@ -91,6 +125,10 @@ const uploadRecommendationLetter = [
             return true;
         })
         .custom(async function (_, { req }) {
+            if (!req.files || req.files.length === 0) {
+                throw new Error('no files');
+            }
+
             const file = req.files.file;
 
             if (!file || !file.data) {
@@ -107,6 +145,10 @@ const uploadRecommendationLetter = [
                 throw new Error('no data');
             }
 
+            if (buffer.byteLength > 5 * 1024 * 1024) {
+                throw new Error('no data');
+            }
+
             if (((await fileType.fromBuffer(buffer) || { 'mime': '' }).mime) !== 'application/pdf') {
                 throw new Error('not pdf');
             }
@@ -115,4 +157,4 @@ const uploadRecommendationLetter = [
         }),
 ];
 
-export { sendRecommendationEmail, uploadRecommendationLetter };
+export { sendRecommendationEmail, uploadRecommendationLetter, getRecommendationInfo };

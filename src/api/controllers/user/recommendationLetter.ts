@@ -11,6 +11,15 @@ async function sendRecommendationEmail(req: express.Request, res: express.Respon
     return res.json({ 'type': 'success' });
 }
 
+async function getRecommendationInfo(req: express.Request, res: express.Response) {
+    const userID = req.query.userID;
+    const recommendationID = req.query.recommendationID;
+
+    const recommendationInfo = await req.db.user.getRecommendationInfo(userID, recommendationID);
+
+    return res.json({ 'type': 'success', recommendationInfo });
+}
+
 async function uploadRecommendationLetter(req: express.Request, res: express.Response) {
     const userID = req.params.userID;
     const recommendationID = req.params.recommendationID;
@@ -23,6 +32,7 @@ async function uploadRecommendationLetter(req: express.Request, res: express.Res
 }
 
 export {
+    getRecommendationInfo,
     sendRecommendationEmail,
     uploadRecommendationLetter,
 };
