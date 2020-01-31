@@ -44,6 +44,14 @@ export default class Server {
         return this.db.tokens().select().where({ 'id': token, type }).first();
     }
 
+    public async getEmail(emailType: string): Promise<string> {
+        return (await this.db.emails().select('content').where({'type': emailType}).first() || {}).content;
+    }
+
+    public async getAllApplicants(): Promise<Array<{'id': string, 'email': string, 'name': string}>> {
+        return this.db.users().select('id', 'email', 'name').where({'verified': true});
+    }
+
     public async getFilesByUserID(userID: string, options?: { returnBuffer?: boolean, returnRecommendations?: boolean }): Promise<Array<{type: string, file: Buffer, created: Date, file_name: string}>> {
         options = options || {};
         const columns = ['type', 'created', 'file_name'];

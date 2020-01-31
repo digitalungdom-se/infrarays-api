@@ -12,7 +12,9 @@ import passport from 'passport';
 import AdminService from 'services/Admin';
 import ServerService from 'services/Server';
 import UserService from 'services/User';
+
 import database from './database';
+import initJobs from './jobs';
 
 // routes to be used
 import apiRoutes from 'api/routes';
@@ -78,14 +80,14 @@ export default async function init(state: string): Promise<express.Application> 
     });
 
     // Passportjs for local strategy authentication
-    const store = new KnexSessionStore({'knex': database});
+    const store = new KnexSessionStore({ 'knex': database });
 
     app.use(session({
         'resave': false,
         'saveUninitialized': true,
         'secret': process.env.SECRET as string,
         store,
-      }));
+    }));
     app.use(passport.initialize());
     app.use(passport.session());
 
@@ -107,10 +109,10 @@ export default async function init(state: string): Promise<express.Application> 
             } else {
                 console.error(`ERROR in route ${url}: `, err);
             }
-         }
+        }
 
         next(err);
-      });
+    });
 
     // Error handler
     app.use(function(err: Express.RequestError, req: express.Request, res: express.Response, next: express.NextFunction) {
@@ -120,13 +122,15 @@ export default async function init(state: string): Promise<express.Application> 
             err.customMessage = 'INTERNAL_SERVER_ERROR';
             err.errors = [];
         } else {
-        if (!err.statusCode) { err.statusCode = 500; }
-        if (!err.customMessage) { err.customMessage = 'INTERNAL_SERVER_ERROR'; }
-        if (!err.errors) { err.errors = []; }
+            if (!err.statusCode) { err.statusCode = 500; }
+            if (!err.customMessage) { err.customMessage = 'INTERNAL_SERVER_ERROR'; }
+            if (!err.errors) { err.errors = []; }
         }
 
         return res.status(err.statusCode).send({ 'type': 'fail', 'msg': err.customMessage, 'errors': err.errors });
-      });
+    });
+
+    await initJobs({ 'server': db.server, 'user': db.user });
 
     // set port to 6972
     app.set('port', (6972));
