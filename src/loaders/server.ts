@@ -58,6 +58,7 @@ export default async function init(state: string): Promise<express.Application> 
         'limits': {
             'fileSize': 5 * 1024 * 1024,
         },
+        'abortOnLimit': true
     }));
 
     // cookie parser
@@ -69,7 +70,7 @@ export default async function init(state: string): Promise<express.Application> 
         'user': new UserService(database),
     };
 
-    app.use(function(req: Express.Request, _, next: express.NextFunction) {
+    app.use(function (req: Express.Request, _, next: express.NextFunction) {
         req.db = {
             'admin': db.admin,
             'server': db.server,
@@ -94,14 +95,14 @@ export default async function init(state: string): Promise<express.Application> 
     // Use routes defined in routes/routes.js
     app.use('/api/', apiRoutes);
 
-    app.all('*', function(req, res, next: express.NextFunction) {
+    app.all('*', function (req, res, next: express.NextFunction) {
         const err: Express.RequestError = new Error('NOT_FOUND');
         err.statusCode = 404;
         next(err);
     });
 
     // Error logger
-    app.use(function(err: Express.RequestError, req: express.Request, res: express.Response, next: express.NextFunction) {
+    app.use(function (err: Express.RequestError, req: express.Request, res: express.Response, next: express.NextFunction) {
         if (err.statusCode === 500 || !err.statusCode) {
             const url = req.protocol + '://' + req.get('host') + req.originalUrl;
             if (err.stack) {
@@ -115,7 +116,7 @@ export default async function init(state: string): Promise<express.Application> 
     });
 
     // Error handler
-    app.use(function(err: Express.RequestError, req: express.Request, res: express.Response, next: express.NextFunction) {
+    app.use(function (err: Express.RequestError, req: express.Request, res: express.Response, next: express.NextFunction) {
         if (typeof err === 'string') {
             err = new Error(err);
             err.statusCode = 500;

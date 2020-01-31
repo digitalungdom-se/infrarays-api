@@ -13,6 +13,7 @@ export default class User {
     private db: {
         emails(): knex.QueryBuilder<database.emails>,
         files(): knex.QueryBuilder<database.files>,
+        surveys(): knex.QueryBuilder<database.surveys>,
         tokens(): knex.QueryBuilder<database.tokens>,
         users(): knex.QueryBuilder<database.users>,
     };
@@ -22,6 +23,7 @@ export default class User {
         this.db = {
             'emails': () => this.knex<database.emails>('emails'),
             'files': () => this.knex<database.files>('files'),
+            'surveys': () => this.knex<database.surveys>('surveys'),
             'tokens': () => this.knex<database.files>('tokens'),
             'users': () => this.knex<database.users>('users'),
         };
@@ -85,6 +87,7 @@ export default class User {
         const body = template.render({});
 
         await Promise.all([
+            this.db.surveys().where({ 'user_id': userID }).del(),
             this.db.files().where({ 'user_id': userID }).del(),
             this.db.tokens().where({ 'user_id': userID }).del(),
         ]);
@@ -96,9 +99,11 @@ export default class User {
     }
 
     public async getCompleteApplication(userID: string): Promise<Buffer> {
-        const [files, user] = await Promise.all([
-            this.db.files().where({ 'user_id': userID }).whereNot({ 'type': 'recommendation' }).select('type', 'file'),
-            this.db.users().where({ 'id': userID }).select('*').first()]);
+        const [files, user, survey] = await Promise.all([
+            this.db.files().select('type', 'file').where({ 'user_id': userID }).whereNot({ 'type': 'recommendation' }),
+            this.db.users().select('*').where({ 'id': userID }).first(),
+            this.db.surveys().select('city', 'school').where({ 'user_id': userID }).first()
+        ]);
 
         const recommendationLetters: Array<string> = [];
 
@@ -112,6 +117,11 @@ export default class User {
                 coverLetterEssay[file.type] = file.file;
             }
         });
+
+        if (survey) {
+            user.city = survey.city;
+            user.school = survey.school;
+        }
 
         const coverPage = await generateCoverPage(user, recommendationLetters, coverLetterEssay);
 
@@ -249,7 +259,7 @@ export default class User {
         await Promise.all(promiseArray);
     }
 
-    public async resetPassword(token: string, password: string) {
+    public async resetPassword(token: string, password: string): Promise<string> {
         const tokenHash = await hasha.async(token, { 'encoding': 'base64' });
         const passwordHash = await bcrypt.hash(password, 12);
         const userID = (await this.db.tokens().select('user_id').where({ 'id': tokenHash, 'type': 'reset_password' }).first()).user_id;
@@ -257,5 +267,25 @@ export default class User {
         await this.db.users().update({ 'password': passwordHash }).where({ 'id': userID });
 
         await this.db.tokens().del().where({ 'id': tokenHash, 'type': 'reset_password' });
+
+        return userID;
+    }
+
+    public async updateSurvey(userID: string, surveyData: Omit<database.surveys, 'id' | 'user_id'>) {
+        const survey: database.surveys = {
+            'id': generateID(16),
+            'user_id': userID,
+            ...surveyData
+        };
+
+        const surveyExists = await this.db.surveys().select('id').where({ 'user_id': userID }).first();
+
+        if (surveyExists) {
+            survey.id = surveyExists.id;
+
+            await this.db.surveys().update(survey).where({ 'id': survey.id });
+        } else {
+            await this.db.surveys().insert(survey);
+        }
     }
 }

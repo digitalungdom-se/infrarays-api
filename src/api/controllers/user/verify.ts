@@ -5,21 +5,30 @@ async function verify(req: express.Request, res: express.Response) {
 
     const userID = await req.db.user.verify(token);
 
-    req.login({'id': userID, 'type': 'user'}, async function(errLogin: Error) {
+    req.login({ 'id': userID, 'type': 'user' }, async function (errLogin: Error) {
         if (errLogin) {
             throw errLogin;
         }
 
-        const [userData, files] = await Promise.all([
-                                    req.db.server.getUserByID(userID),
-                                    req.db.server.getFilesByUserID(userID),
-                                    ]);
+        const [userData, files, survey] = await Promise.all([
+            req.db.server.getUserByID(userID),
+            req.db.server.getFilesByUserID(userID),
+            req.db.server.getSurveyByUserID(userID),
+        ]);
 
-        userData.recommendations.forEach(function(file: any) { delete file.id; });
-        delete userData.id;
-        delete userData.password;
+        if (userData) {
+            userData.recommendations.forEach(function (file: any) { delete file.id; });
+            delete userData.id;
+            delete userData.password;
+        }
 
-        return res.json({ 'type': 'success', userData, files });
+
+        if (survey) {
+            delete survey.id;
+            delete survey.user_id;
+        }
+
+        return res.json({ 'type': 'success', userData, files, survey });
     });
 }
 

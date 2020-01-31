@@ -2,7 +2,7 @@ import passport from 'configs/passport';
 import express from 'express';
 
 async function login(req: express.Request, res: express.Response) {
-    passport.authenticate('local.user', function(err, user: {id: string, type: 'user'}, info) {
+    passport.authenticate('local.user', function (err, user: { id: string, type: 'user'; }, info) {
         if (err) {
             throw err;
         }
@@ -12,21 +12,32 @@ async function login(req: express.Request, res: express.Response) {
             return;
         }
 
-        req.login(user, async function(errLogin: Error) {
+        const userID = user.id;
+
+        req.login({ 'id': userID, 'type': 'user' }, async function (errLogin: Error) {
             if (errLogin) {
                 throw errLogin;
             }
 
-            const [userData, files] = await Promise.all([
-                                        req.db.server.getUserByID(user.id),
-                                        req.db.server.getFilesByUserID(user.id),
-                                        ]);
+            const [userData, files, survey] = await Promise.all([
+                req.db.server.getUserByID(userID),
+                req.db.server.getFilesByUserID(userID),
+                req.db.server.getSurveyByUserID(userID),
+            ]);
 
-            userData.recommendations.forEach(function(file: any) { delete file.id; });
-            delete userData.id;
-            delete userData.password;
+            if (userData) {
+                userData.recommendations.forEach(function (file: any) { delete file.id; });
+                delete userData.id;
+                delete userData.password;
+            }
 
-            res.json({ 'type': 'success', userData, files });
+
+            if (survey) {
+                delete survey.id;
+                delete survey.user_id;
+            }
+
+            return res.json({ 'type': 'success', userData, files, survey });
         });
     })(req, res);
 }

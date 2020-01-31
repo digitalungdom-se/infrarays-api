@@ -30,4 +30,6 @@ router.post('/user/upload/recommendation/:userID/:recommendationID', validate(va
 
 router.post('/user/upload/pdf/:fileType', ensureUserAuthenticated, validate(validators.user.uploadPDF), controllers.user.uploadPDF);
 
+router.post('/user/survey', ensureAdminAuthenticated, validate(validators.user.survey), controllers.user.survey);
+
 export default router;
