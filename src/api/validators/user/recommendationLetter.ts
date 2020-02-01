@@ -146,7 +146,7 @@ const uploadRecommendationLetter = [
             }
 
             if (buffer.byteLength > 5 * 1024 * 1024) {
-                throw new Error('no data');
+                throw new Error('too large');
             }
 
             if (((await fileType.fromBuffer(buffer) || { 'mime': '' }).mime) !== 'application/pdf') {
