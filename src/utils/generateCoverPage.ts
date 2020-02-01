@@ -40,6 +40,8 @@ interface IFileDetails {
 type recommendationLettersDetails = Array<string>;
 
 export default async function (user: IUserDetails, recommendationLetters: recommendationLettersDetails, files: IFileDetails): Promise<Buffer> {
+    user.name = user.name.toLowerCase().split(' ').map((s: string) => s.charAt(0).toUpperCase() + s.substring(1)).join(' ');
+
     let wordsCoverLetter = 0;
     if (files.coverLetter) {
         wordsCoverLetter = (await pdfParse(files.coverLetter)).text.replace(/[.,?!;()"'-]/g, ' ').replace(/\s+/g, ' ').toLowerCase().split(' ').length;
