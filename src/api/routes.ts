@@ -24,6 +24,8 @@ router.put('/user/password/reset', validate(validators.user.resetPassword), cont
 
 router.post('/user/register', validate(validators.user.register), controllers.user.register);
 router.post('/user/verify', validate(validators.user.verify), controllers.user.verify);
+router.post('/user/resend/verification', validate(validators.user.resendVerification), controllers.user.resendVerification);
+
 
 router.post('/user/send/recommendation', validate(validators.user.sendRecommendationEmail), controllers.user.sendRecommendationEmail);
 router.post('/user/upload/recommendation/:userID/:recommendationID', validate(validators.user.uploadRecommendationLetter), controllers.user.uploadRecommendationLetter);

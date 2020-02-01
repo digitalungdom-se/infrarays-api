@@ -302,4 +302,15 @@ export default class User {
             await this.db.surveys().insert(survey);
         }
     }
+
+    public async resendVerification(email: string) {
+        const user = await this.db.users().select('id', 'verified').where({ 'email': email }).first();
+        const token = await this.db.tokens().select('id').where({ 'user_id': user.id }).first();
+
+        const templateData = (await this.db.emails().select('content').where({ 'type': 'verify_email' }).first()).content;
+        const template = Hogan.compile(templateData);
+        const body = template.render({ 'token': token.id });
+
+        await sendMail(email, 'Verifiera din din e-postadress', body);
+    }
 }

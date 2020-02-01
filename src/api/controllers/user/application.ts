@@ -14,7 +14,7 @@ async function downloadApplication(req: express.Request, res: express.Response) 
     const fileName = user.name.replace(/ /g, '_');
 
     res.set('Content-disposition', 'inline; filename=' + `${fileName}.pdf`);
-    res.set('Content-Type', 'application/pdf');
+    res.contentType('application/pdf');
     res.set('Content-Length', file.byteLength.toString());
 
     return res.send(file);

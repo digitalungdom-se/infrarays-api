@@ -1,5 +1,6 @@
 import express from 'express';
 import { body } from 'express-validator';
+import moment from 'moment';
 
 const register = [
     body('email')
@@ -29,8 +30,16 @@ const register = [
         }),
 
     body('birthdate')
-        .isISO8601()
-        .toDate(),
+        .custom(function (dateString: string) {
+            if (!moment.utc(dateString).isValid()) {
+                throw new Error('invalid date');
+            }
+
+            return true;
+        })
+        .customSanitizer(function (dateString: string) {
+            return moment.utc(dateString).toDate();
+        }),
 
     body('finnish')
         .isBoolean()
