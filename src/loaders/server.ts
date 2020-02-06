@@ -114,9 +114,9 @@ export default async function init(state: string): Promise<express.Application> 
         if (err.statusCode === 500 || !err.statusCode) {
             const url = req.protocol + '://' + req.get('host') + req.originalUrl;
             if (err.stack) {
-                console.error(`ERROR in route ${url}: `, err.stack);
+                console.error(`${(new Date()).toISOString()}: ERROR in route ${url}: `, err.stack);
             } else {
-                console.error(`ERROR in route ${url}: `, err);
+                console.error(`${(new Date()).toISOString()}: ERROR in route ${url}: `, err);
             }
         }
 
