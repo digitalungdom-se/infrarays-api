@@ -150,7 +150,7 @@ const uploadRecommendationLetter = [
       }
 
       if (
-        ((await fileType.fromBuffer(buffer)) || { mime: '' }).mime !==
+        ((await fileType.fromBuffer(buffer)) || { 'mime': '' }).mime !==
         'application/pdf'
       ) {
         throw new Error('not pdf');
