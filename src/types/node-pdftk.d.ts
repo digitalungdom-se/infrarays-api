@@ -1,1 +1,1 @@
-declare module 'node-pdftk';
+declare module "node-pdftk";

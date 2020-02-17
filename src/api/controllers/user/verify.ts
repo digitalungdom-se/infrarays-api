@@ -1,11 +1,11 @@
-import express from 'express';
+import express from "express";
 
 async function verify(req: express.Request, res: express.Response) {
     const token = req.body.token;
 
     const userID = await req.db.user.verify(token);
 
-    req.login({ 'id': userID, 'type': 'user' }, async function (errLogin: Error) {
+    req.login({ id: userID, type: "user" }, async function(errLogin: Error) {
         if (errLogin) {
             throw errLogin;
         }
@@ -17,21 +17,20 @@ async function verify(req: express.Request, res: express.Response) {
         ]);
 
         if (userData) {
-            userData.recommendations.forEach(function (file: any) { delete file.id; });
+            userData.recommendations.forEach(function(file: any) {
+                delete file.id;
+            });
             delete userData.id;
             delete userData.password;
         }
-
 
         if (survey) {
             delete survey.id;
             delete survey.user_id;
         }
 
-        return res.json({ 'type': 'success', userData, files, survey });
+        return res.json({ type: "success", userData, files, survey });
     });
 }
 
-export {
-    verify,
-};
+export { verify };

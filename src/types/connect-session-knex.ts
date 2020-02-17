@@ -1,1 +1,1 @@
-declare module 'connect-session-knex';
+declare module "connect-session-knex";

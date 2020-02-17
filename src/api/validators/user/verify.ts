@@ -1,17 +1,17 @@
-import express from 'express';
-import { body } from 'express-validator';
+import express from "express";
+import { body } from "express-validator";
 
 const verify = [
-    body('token')
+    body("token")
         .isString()
-        .isLength({'min': 16, 'max': 16})
+        .isLength({ min: 16, max: 16 })
         .custom(async function(token: string, meta) {
-            const req = meta.req as unknown as express.Request;
+            const req = (meta.req as unknown) as express.Request;
 
-            const tokenExists = await req.db.server.getTokenByIDAndType(token, 'verify_email');
+            const tokenExists = await req.db.server.getTokenByIDAndType(token, "verify_email");
 
             if (!tokenExists) {
-                throw new Error('no token');
+                throw new Error("no token");
             }
 
             return true;

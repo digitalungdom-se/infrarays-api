@@ -1,27 +1,36 @@
-import express from 'express';
+import express from "express";
 
 async function ensureUserAuthenticated(req: express.Request, _: express.Response, next: express.NextFunction) {
-    if (req.isAuthenticated() && req.db.server.getUserByID(req.user?.id || '')) {
+    if (req.isAuthenticated() && req.db.server.getUserByID(req.user?.id || "")) {
         return next();
     }
 
-    const err: Express.RequestError = new Error('UNAUTHORISED');
+    const err: Express.RequestError = new Error("UNAUTHORISED");
     err.statusCode = 401;
-    err.customMessage = 'UNAUTHORISED';
+    err.customMessage = "UNAUTHORISED";
     next(err);
-
 }
 
 async function ensureAdminAuthenticated(req: express.Request, _: express.Response, next: express.NextFunction) {
-    if (req.isAuthenticated() && req.db.server.getAdminByID(req.user?.id || '')) {
+    if (req.isAuthenticated() && req.user!.type === "admin") {
         return next();
     }
 
-    const err: Express.RequestError = new Error('UNAUTHORISED');
+    const err: Express.RequestError = new Error("UNAUTHORISED");
     err.statusCode = 401;
-    err.customMessage = 'UNAUTHORISED';
+    err.customMessage = "UNAUTHORISED";
     next(err);
+}
 
+async function ensureSuperAdminAuthenticated(req: express.Request, _: express.Response, next: express.NextFunction) {
+    if (req.isAuthenticated() && req.user!.type === "admin" && (await req.db.server.getAdminByID(req.user!.id)).super_admin) {
+        return next();
+    }
+
+    const err: Express.RequestError = new Error("UNAUTHORISED");
+    err.statusCode = 401;
+    err.customMessage = "UNAUTHORISED";
+    next(err);
 }
 
 function ensureAuthenticated(req: express.Request, _: express.Response, next: express.NextFunction) {
@@ -29,10 +38,10 @@ function ensureAuthenticated(req: express.Request, _: express.Response, next: ex
         return next();
     }
 
-    const err: Express.RequestError = new Error('UNAUTHORISED');
+    const err: Express.RequestError = new Error("UNAUTHORISED");
     err.statusCode = 401;
-    err.customMessage = 'UNAUTHORISED';
+    err.customMessage = "UNAUTHORISED";
     next(err);
 }
 
-export { ensureUserAuthenticated, ensureAdminAuthenticated, ensureAuthenticated };
+export { ensureUserAuthenticated, ensureAdminAuthenticated, ensureAuthenticated, ensureSuperAdminAuthenticated };

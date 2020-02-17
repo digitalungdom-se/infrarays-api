@@ -1,6 +1,4 @@
-/* tslint:disable */
-
-
+/* eslint-disable */
 /**
  * AUTO-GENERATED FILE @ 2020-01-31 21:06:34 - DO NOT EDIT!
  *
@@ -9,13 +7,11 @@
  *
  */
 
-
 export namespace knex_migrationsFields {
     export type id = number;
     export type name = string | null;
     export type batch = number | null;
     export type migration_time = Date | null;
-
 }
 
 export interface knex_migrations {
@@ -23,7 +19,6 @@ export interface knex_migrations {
     name: knex_migrationsFields.name;
     batch: knex_migrationsFields.batch;
     migration_time: knex_migrationsFields.migration_time;
-
 }
 
 export namespace surveysFields {
@@ -36,7 +31,6 @@ export namespace surveysFields {
     export type application_process = number;
     export type improvement = string;
     export type informant = string;
-
 }
 
 export interface surveys {
@@ -49,45 +43,38 @@ export interface surveys {
     application_process: surveysFields.application_process;
     improvement: surveysFields.improvement;
     informant: surveysFields.informant;
-
 }
 
 export namespace backemailFields {
     export type type = string;
     export type content = string;
-
 }
 
 export interface backemail {
     type: backemailFields.type;
     content: backemailFields.content;
-
 }
 
 export namespace emailsFields {
     export type type = string;
     export type content = string;
-
 }
 
 export interface emails {
     type: emailsFields.type;
     content: emailsFields.content;
-
 }
 
 export namespace tokensFields {
     export type id = string;
     export type type = string;
     export type user_id = string;
-
 }
 
 export interface tokens {
     id: tokensFields.id;
     type: tokensFields.type;
     user_id: tokensFields.user_id;
-
 }
 
 export namespace usersFields {
@@ -97,9 +84,8 @@ export namespace usersFields {
     export type name = string;
     export type birthdate = Date;
     export type finnish = boolean;
-    export type recommendations = Array<Object>;
+    export type recommendations = Array<Record<string, any>>;
     export type verified = boolean;
-
 }
 
 export interface users {
@@ -111,7 +97,6 @@ export interface users {
     finnish: usersFields.finnish;
     recommendations: usersFields.recommendations;
     verified: usersFields.verified;
-
 }
 
 export namespace gradesFields {
@@ -125,7 +110,6 @@ export namespace gradesFields {
     export type recommendation = number;
     export type overall = number;
     export type comment = string | null;
-
 }
 
 export interface grades {
@@ -139,21 +123,18 @@ export interface grades {
     recommendation: gradesFields.recommendation;
     overall: gradesFields.overall;
     comment: gradesFields.comment;
-
 }
 
 export namespace sessionsFields {
     export type sid = string;
-    export type sess = Object;
+    export type sess = Record<string, any>;
     export type expired = Date;
-
 }
 
 export interface sessions {
     sid: sessionsFields.sid;
     sess: sessionsFields.sess;
     expired: sessionsFields.expired;
-
 }
 
 export namespace adminsFields {
@@ -163,7 +144,6 @@ export namespace adminsFields {
     export type name = string;
     export type super_admin = boolean;
     export type grading_order = any;
-
 }
 
 export interface admins {
@@ -173,7 +153,6 @@ export interface admins {
     name: adminsFields.name;
     super_admin: adminsFields.super_admin;
     grading_order: adminsFields.grading_order;
-
 }
 
 export namespace filesFields {
@@ -183,7 +162,6 @@ export namespace filesFields {
     export type created = Date;
     export type file_name = string;
     export type file = Buffer;
-
 }
 
 export interface files {
@@ -193,17 +171,14 @@ export interface files {
     created: filesFields.created;
     file_name: filesFields.file_name;
     file: filesFields.file;
-
 }
 
 export namespace knex_migrations_lockFields {
     export type index = number;
     export type is_locked = number | null;
-
 }
 
 export interface knex_migrations_lock {
     index: knex_migrations_lockFields.index;
     is_locked: knex_migrations_lockFields.is_locked;
-
 }

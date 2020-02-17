@@ -1,48 +1,49 @@
-import knex from 'knex';
-import config from './index';
+import config from "./index";
 
-interface IKnexConfig {
+interface KnexConfig {
     development: object;
     production: object;
     [key: string]: object;
 }
 
-const knexConfig: IKnexConfig = {
-
-    'development': {
-        'client': 'pg',
-        'connection': config.databaseURI,
-        'pool': { 'max': 10, 'min': 0,
-            'afterCreate'(connection: any, callback: any) {
-                connection.query('SET TIME ZONE \'UTC\';', function(err: Error) {
+const knexConfig: KnexConfig = {
+    development: {
+        client: "pg",
+        connection: config.databaseURI,
+        pool: {
+            max: 10,
+            min: 0,
+            afterCreate(connection: any, callback: any) {
+                connection.query("SET TIME ZONE 'UTC';", function(err: Error) {
                     callback(err, connection);
-                    });
-                },
+                });
             },
-        'useNullAsDefault': true,
+        },
+        useNullAsDefault: true,
 
-        'migrations': {
-            'directory': '../../database/migrations/tmp',
+        migrations: {
+            directory: "../../database/migrations/tmp",
         },
     },
 
-    'production': {
-        'client': 'pg',
-        'connection': config.databaseURI,
-        'pool': { 'max': 10, 'min': 0,
-            'afterCreate'(connection: any, callback: any) {
-                connection.query('SET TIME ZONE \'UTC\';', function(err: Error) {
+    production: {
+        client: "pg",
+        connection: config.databaseURI,
+        pool: {
+            max: 10,
+            min: 0,
+            afterCreate(connection: any, callback: any) {
+                connection.query("SET TIME ZONE 'UTC';", function(err: Error) {
                     callback(err, connection);
-                    });
-                },
-    },
-        'useNullAsDefault': true,
+                });
+            },
+        },
+        useNullAsDefault: true,
 
-        'migrations': {
-            'directory': '../../database/migrations/tmp',
+        migrations: {
+            directory: "../../database/migrations/tmp",
         },
     },
-
 };
 
 module.exports = knexConfig;

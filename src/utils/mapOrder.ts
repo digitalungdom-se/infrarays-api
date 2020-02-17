@@ -1,6 +1,5 @@
 export default function mapOrder(array: Array<any>, order: Array<string>, key: string): Array<any> {
-
-    array.sort(function (a, b) {
+    array.sort(function(a, b) {
         const A = a[key];
         const B = b[key];
 
@@ -9,8 +8,6 @@ export default function mapOrder(array: Array<any>, order: Array<string>, key: s
         }
 
         return -1;
-
-
     });
 
     return array;

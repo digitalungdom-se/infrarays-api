@@ -1,12 +1,14 @@
-import express from 'express';
-import database from 'types/database';
+import express from "express";
 
 async function auth(req: express.Request, res: express.Response) {
-    const userID = req.user?.id || '';
+    const userID = req.user?.id || "";
     const userType = req.user?.type;
 
-    if (userType === 'admin') {
+    if (userType === "admin") {
         const admin = await req.db.server.getAdminByID(userID);
+        delete admin.password;
+
+        admin.grading_order = await req.db.admin.getApplicationOrder(admin.id);
         return res.json(admin);
     }
 
@@ -17,18 +19,19 @@ async function auth(req: express.Request, res: express.Response) {
     ]);
 
     if (userData) {
-        userData.recommendations.forEach(function (file: any) { delete file.id; });
+        userData.recommendations.forEach(function(file: any) {
+            delete file.id;
+        });
         delete userData.id;
         delete userData.password;
     }
-
 
     if (survey) {
         delete survey.id;
         delete survey.user_id;
     }
 
-    return res.json({ 'type': 'success', userData, files, survey });
+    return res.json({ type: "success", userData, files, survey });
 }
 
 export { auth };

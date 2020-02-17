@@ -1,8 +1,4 @@
-import { ensureAdminAuthenticated, ensureUserAuthenticated } from './ensureAuthentication';
-import { validate } from './validate';
+import { ensureAdminAuthenticated, ensureUserAuthenticated } from "./ensureAuthentication";
+import { validate } from "./validate";
 
-export {
-    ensureUserAuthenticated,
-    ensureAdminAuthenticated,
-    validate,
-};
+export { ensureUserAuthenticated, ensureAdminAuthenticated, validate };

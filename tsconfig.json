@@ -10,7 +10,7 @@
         "baseUrl": "src",
         "paths": { "*": ["*"] },
 
-        "noImplicitReturns": true,
+        "noImplicitReturns": false,
         "noImplicitThis": true,
         "noImplicitAny": true,
         "strictNullChecks": true,
@@ -18,12 +18,12 @@
 
         "allowJs": false,
 
-        "plugins": [{
-            "transform": "@zerollup/ts-transform-paths"
-        }]
+        "plugins": [
+            {
+                "transform": "@zerollup/ts-transform-paths"
+            }
+        ]
     },
 
-    "include": [
-        "src/**/*"
-    ]
+    "include": ["src/**/*"]
 }

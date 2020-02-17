@@ -1,11 +1,11 @@
-import express from 'express';
+import express from "express";
 
 async function sendForgotPassword(req: express.Request, res: express.Response) {
     const email = req.body.email;
 
     await req.db.user.sendForgotPassword(email);
 
-    return res.json({ 'type': 'success' });
+    return res.json({ type: "success" });
 }
 
 async function resetPassword(req: express.Request, res: express.Response) {
@@ -14,7 +14,7 @@ async function resetPassword(req: express.Request, res: express.Response) {
 
     const userID = await req.db.user.resetPassword(token, password);
 
-    req.login({ 'id': userID, 'type': 'user' }, async function (errLogin: Error) {
+    req.login({ id: userID, type: "user" }, async function(errLogin: Error) {
         if (errLogin) {
             throw errLogin;
         }
@@ -26,22 +26,20 @@ async function resetPassword(req: express.Request, res: express.Response) {
         ]);
 
         if (userData) {
-            userData.recommendations.forEach(function (file: any) { delete file.id; });
+            userData.recommendations.forEach(function(file: any) {
+                delete file.id;
+            });
             delete userData.id;
             delete userData.password;
         }
-
 
         if (survey) {
             delete survey.id;
             delete survey.user_id;
         }
 
-        return res.json({ 'type': 'success', userData, files, survey });
+        return res.json({ type: "success", userData, files, survey });
     });
 }
 
-export {
-    sendForgotPassword,
-    resetPassword,
-};
+export { sendForgotPassword, resetPassword };

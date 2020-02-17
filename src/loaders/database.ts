@@ -1,8 +1,8 @@
-const env = process.env.NODE_ENV || 'development';
-import knexConfig from 'configs/knexfile';
-import knex from 'knex';
-import moment from 'moment';
-import pg from 'pg';
+const env = process.env.NODE_ENV || "development";
+import knexConfig from "configs/knexfile";
+import knex from "knex";
+import moment from "moment";
+import pg from "pg";
 
 function parseDates(str: string): Date {
     return moment.utc(str).toDate();

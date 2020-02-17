@@ -1,4 +1,4 @@
-import express from 'express';
+import express from "express";
 
 async function resendVerification(req: express.Request, res: express.Response) {
     const email = req.body.email;
@@ -6,7 +6,7 @@ async function resendVerification(req: express.Request, res: express.Response) {
     await req.db.user.resendVerification(email);
 
     return res.json({
-        'type': 'success',
+        type: "success",
     });
 }
 
