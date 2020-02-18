@@ -211,6 +211,7 @@ export default class User {
             } else {
                 recommendations[index].id = generateID(16);
                 recommendations[index].email = newEmail;
+                email = newEmail;
             }
         } else {
             id = generateID(16);
