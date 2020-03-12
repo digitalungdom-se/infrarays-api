@@ -276,4 +276,8 @@ export default class Admin {
     public async getSurveys() {
         return this.db.surveys().select();
     }
+
+    public async getAdmins() {
+        return this.db.admins().select("email", "name", "super_admin", "id");
+    }
 }

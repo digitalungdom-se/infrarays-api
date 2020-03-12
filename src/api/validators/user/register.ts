@@ -26,7 +26,10 @@ const register = [
         .isString()
         .isLength({ min: 3, max: 256 })
         .customSanitizer(function(name: string) {
-            return name.toLowerCase();
+            return name
+                .toLowerCase()
+                .replace(/\s+/g, " ")
+                .trim();
         }),
 
     body("birthdate")

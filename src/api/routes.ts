@@ -49,6 +49,7 @@ router.delete("/admin/logout", controllers.admin.logout);
 
 router.post("/admin/randomise_grading_order", ensureAdminAuthenticated, controllers.admin.randomiseGradingOrder);
 
+router.get("/admin/get/admins", ensureAdminAuthenticated, controllers.admin.getAdmins);
 router.get("/admin/get/applications", ensureAdminAuthenticated, controllers.admin.getApplications);
 router.get("/admin/get/application", ensureAdminAuthenticated, validate(validators.admin.getApplication), controllers.admin.getApplication);
 router.get("/admin/get/application_order", ensureAdminAuthenticated, controllers.admin.getApplicationOrder);
