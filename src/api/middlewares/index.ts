@@ -1,4 +1,3 @@
-import { ensureAdminAuthenticated, ensureUserAuthenticated } from "./ensureAuthentication";
-import { validate } from "./validate";
-
-export { ensureUserAuthenticated, ensureAdminAuthenticated, validate };
+export * from "./ensureAuthentication";
+export * from "./lockRoute";
+export * from "./validate";

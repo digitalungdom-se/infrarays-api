@@ -1,47 +1,73 @@
 import express from "express";
 import "express-async-errors";
+import moment from "moment";
 
 const router = express.Router();
 
-import { validate } from "./middlewares";
 import {
     ensureAdminAuthenticated,
     ensureAuthenticated,
     ensureUserAuthenticated,
     ensureSuperAdminAuthenticated,
-} from "./middlewares/ensureAuthentication";
+    lockRoute,
+    validate,
+} from "./middlewares";
 
 import controllers from "./controllers";
 import validators from "./validators";
 
+const lockRoute01032020Date = moment.utc([2020, 3, 1, 3]).toDate();
+const lockRoute01032020 = lockRoute(lockRoute01032020Date);
+console.log(`${moment.utc().toISOString()}: activating lock routes for ${lockRoute01032020Date.toUTCString()}`);
+
 // auth
 router.get("/auth", ensureAuthenticated, controllers.auth);
+router.get("/test", lockRoute01032020, function(req: express.Request, res: express.Response) {
+    res.sendStatus(200);
+});
 
 // user
 router.post("/user/login", validate(validators.user.login), controllers.user.login);
 router.delete("/user/logout", controllers.user.logout);
 
 router.get("/user/application", ensureUserAuthenticated, controllers.user.downloadApplication);
-router.delete("/user/application", ensureUserAuthenticated, controllers.user.deleteApplication);
+router.delete("/user/application", lockRoute01032020, ensureUserAuthenticated, controllers.user.deleteApplication);
 
 router.post("/user/password/forgot", validate(validators.user.sendForgotPassword), controllers.user.sendForgotPassword);
 router.put("/user/password/reset", validate(validators.user.resetPassword), controllers.user.resetPassword);
 
-router.post("/user/register", validate(validators.user.register), controllers.user.register);
-router.post("/user/verify", validate(validators.user.verify), controllers.user.verify);
-router.post("/user/resend/verification", validate(validators.user.resendVerification), controllers.user.resendVerification);
+router.post("/user/register", lockRoute01032020, validate(validators.user.register), controllers.user.register);
+router.post("/user/verify", lockRoute01032020, validate(validators.user.verify), controllers.user.verify);
+router.post(
+    "/user/resend/verification",
+    lockRoute01032020,
+    validate(validators.user.resendVerification),
+    controllers.user.resendVerification,
+);
 
-router.post("/user/send/recommendation", validate(validators.user.sendRecommendationEmail), controllers.user.sendRecommendationEmail);
+router.post(
+    "/user/send/recommendation",
+    lockRoute01032020,
+    validate(validators.user.sendRecommendationEmail),
+    controllers.user.sendRecommendationEmail,
+);
 router.post(
     "/user/upload/recommendation/:userID/:recommendationID",
+    lockRoute01032020,
     validate(validators.user.uploadRecommendationLetter),
     controllers.user.uploadRecommendationLetter,
 );
 router.get("/user/recommendation", validate(validators.user.getRecommendationInfo), controllers.user.getRecommendationInfo);
 
-router.post("/user/upload/pdf/:fileType", ensureUserAuthenticated, validate(validators.user.uploadPDF), controllers.user.uploadPDF);
+router.post(
+    "/user/upload/pdf/:fileType",
+    lockRoute01032020,
+    ensureUserAuthenticated,
+    validate(validators.user.uploadPDF),
+    controllers.user.uploadPDF,
+);
 
-router.post("/user/survey", validate(validators.user.survey), controllers.user.survey);
+router.post("/user/survey", lockRoute01032020, validate(validators.user.survey), controllers.user.survey);
 
 // Admins
 router.post("/admin/login", validate(validators.admin.login), controllers.admin.login);
