@@ -28,7 +28,7 @@ const gradeApplication = [
         .isInt({ min: 0, max: 4 })
         .toInt(),
 
-    body("grade")
+    body("grades")
         .isInt({ min: 0, max: 4 })
         .toInt(),
 
