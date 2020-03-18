@@ -67,7 +67,7 @@ router.post(
     controllers.user.uploadPDF,
 );
 
-router.post("/user/survey", lockRoute01032020, validate(validators.user.survey), controllers.user.survey);
+router.post("/user/survey", lockRoute01032020, ensureUserAuthenticated, validate(validators.user.survey), controllers.user.survey);
 
 // Admins
 router.post("/admin/login", validate(validators.admin.login), controllers.admin.login);
