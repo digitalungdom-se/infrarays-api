@@ -7,7 +7,7 @@ async function gradeApplication(req: Request, res: Response) {
         cv: req.body.cv,
         coverLetter: req.body.coverLetter,
         essay: req.body.essay,
-        grade: req.body.grade,
+        grade: req.body.grades,
         recommendation: req.body.recommendation,
         overall: req.body.overall,
         comment: req.body.comment,
