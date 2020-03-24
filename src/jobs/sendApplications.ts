@@ -1,22 +1,20 @@
 import Hogan from "hogan.js";
 import moment from "moment";
-
-import { sendMail } from "utils";
-
 import Server from "services/Server";
 import User from "services/User";
+import { sendMail } from "utils";
 
 interface Db {
     user: User;
     server: Server;
 }
 
-export default function sendApplicationsJob(db: Db, when: "WEEK" | "DAY" | "CLOSED") {
+export default function sendApplicationsJob(db: Db, when: "WEEK" | "4DAYS" | "DAY" | "CLOSED") {
     return async function() {
         const applicationsPromise = db.server.getAllApplicants();
 
         let templateData = "";
-        if (when === "WEEK" || when === "DAY") {
+        if (when === "WEEK" || when === "4DAYS" || when === "DAY") {
             templateData = await db.server.getEmail("application_closing");
         } else {
             templateData = await db.server.getEmail("application_closed");
@@ -39,6 +37,9 @@ export default function sendApplicationsJob(db: Db, when: "WEEK" | "DAY" | "CLOS
                 case "WEEK":
                     body = template.render({ name: name, closing: "en vecka" });
                     break;
+                case "4DAYS":
+                    body = template.render({ name: name, closing: "fyra dagar" });
+                    break;
                 case "DAY":
                     body = template.render({ name: name, closing: "en dag" });
                     break;
@@ -47,16 +48,22 @@ export default function sendApplicationsJob(db: Db, when: "WEEK" | "DAY" | "CLOS
                     break;
             }
 
-            const application = await db.user.getCompleteApplication(user.id);
+            try {
+                const application = await db.user.getCompleteApplication(user.id);
 
-            const fileName = user.name.replace(/ /g, "_");
+                const fileName = user.name.replace(/ /g, "_");
 
-            await sendMail(user.email, "Din ansökning", body, [
-                {
-                    content: application,
-                    filename: `${fileName}.pdf`,
-                },
-            ]);
+                await sendMail(user.email, "Din ansökning", body, [
+                    {
+                        content: application,
+                        filename: `${fileName}.pdf`,
+                    },
+                ]);
+            } catch (e) {
+                console.error(`ERROR SENDING APPLICATION TO ${name} (${user.id})`, e);
+
+                await sendMail(user.email, "Din ansökning", body);
+            }
         }
 
         console.log(`${moment.utc().toISOString()}: SENT ALL APPLICATIONS`);

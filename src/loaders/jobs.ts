@@ -23,6 +23,18 @@ export default async function initJobs(db: Db) {
         .millisecond(0)
         .tz("Europe/Stockholm")
         .toDate();
+
+    const fourDaysLeft = moment()
+        .year(thisYear)
+        .month(2)
+        .date(27)
+        .hour(17)
+        .minute(0)
+        .second(0)
+        .millisecond(0)
+        .tz("Europe/Stockholm")
+        .toDate();
+
     const oneDayLeftDate = moment()
         .year(thisYear)
         .month(2)
@@ -33,6 +45,7 @@ export default async function initJobs(db: Db) {
         .millisecond(0)
         .tz("Europe/Stockholm")
         .toDate();
+
     const closedDate = moment()
         .year(thisYear)
         .month(3)
@@ -50,6 +63,9 @@ export default async function initJobs(db: Db) {
 
     console.log(`${moment.utc().toISOString()}: SCHEDULING sendApplicationsJob for ${oneWeekLeftDate.toUTCString()}`);
     schedule.scheduleJob(oneWeekLeftDate, sendApplicationsJob(db, "WEEK"));
+
+    console.log(`${moment.utc().toISOString()}: SCHEDULING sendApplicationsJob for ${fourDaysLeft.toUTCString()}`);
+    schedule.scheduleJob(fourDaysLeft, sendApplicationsJob(db, "4DAYS"));
 
     console.log(`${moment.utc().toISOString()}: SCHEDULING sendApplicationsJob for ${oneDayLeftDate.toUTCString()}`);
     schedule.scheduleJob(oneDayLeftDate, sendApplicationsJob(db, "DAY"));
