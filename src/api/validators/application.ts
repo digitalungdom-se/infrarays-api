@@ -12,6 +12,7 @@ const getFile = [
   param("fileID")
     .isString()
     .isUUID()
+    .bail()
     .custom(async function (fileID: string, meta) {
       const req = meta.req as Request;
 
@@ -19,7 +20,7 @@ const getFile = [
       const file = await req.services.Storage.getByID(fileID);
 
       if (!file || file.userId !== userID || file.type === FileType.RecommendationLetter) {
-        throw new Error();
+        throw new Error("No such file.:STORAGE-404:404");
       }
 
       return true;
@@ -35,6 +36,7 @@ const uploadFile = [
     .toUpperCase()
     .isIn(["CV", "COVER_LETTER", "ESSAY", "GRADES", "APPENDIX"])
     .if((fileType: string) => fileType === FileType.Appendix)
+    .bail()
     .custom(async function (fileType: string, meta) {
       const req = meta.req as Request;
       const userID = req.user!.id;
@@ -50,7 +52,7 @@ const uploadFile = [
       });
 
       if (appendixCount >= 5) {
-        throw new Error();
+        throw new Error("Too many appendix files.:STORAGE-429:422");
       }
 
       return true;
@@ -62,6 +64,7 @@ const deleteFile = [
   param("fileID")
     .isString()
     .isUUID()
+    .bail()
     .custom(async function (fileID: string, meta) {
       const req = meta.req as Request;
 
@@ -69,7 +72,7 @@ const deleteFile = [
       const file = await req.services.Storage.getByID(fileID);
 
       if (!file || file.userId !== userID) {
-        throw new Error();
+        throw new Error("No such file.:STORAGE-404:404");
       }
 
       return true;
@@ -79,7 +82,7 @@ const deleteFile = [
 const getSurvey = [param("userID").isString().isUUID().custom(validators.isUserApplicant)];
 
 const saveSurvey = [
-  param("userID").isString().isUUID().custom(validators.isUserApplicant),
+  param("userID").isString().isUUID().bail().custom(validators.isUserApplicant),
   body("city").isString().isLength({ min: 1, max: 256 }),
   body("school").isString().isLength({ min: 1, max: 256 }),
   body("gender").isString().isIn(["MALE", "FEMALE", "OTHER", "UNDISCLOSED"]),
@@ -94,6 +97,7 @@ const sendRecommendationRequest = [
   body("email")
     .isString()
     .isEmail()
+    .bail()
     .custom(async function (email: string, meta) {
       const req = meta.req as Request;
 
@@ -103,7 +107,7 @@ const sendRecommendationRequest = [
 
       recommendations.forEach(recommendation => {
         if (validator.normalizeEmail(recommendation.email) === validator.normalizeEmail(email) && recommendation.index !== +req.params.index) {
-          throw new Error();
+          throw new Error("Recommendation already sent to that email address.:APPLICATION-429:422");
         }
       });
 
@@ -119,13 +123,14 @@ const uploadRecommendation = [
   param("recommendationCode")
     .isString()
     .isLength({ min: 0, max: 256 })
+    .bail()
     .custom(async function (recommendationCode: string, meta) {
       const req = meta.req as Request;
 
       const recommendation = await req.services.Application.getRecommendationByCode(recommendationCode);
 
       if (!recommendation) {
-        throw new Error();
+        throw new Error("No such recommendation.:APPLICATION-405:404");
       }
 
       return true;

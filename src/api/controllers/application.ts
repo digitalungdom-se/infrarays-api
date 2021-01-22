@@ -58,8 +58,12 @@ async function uploadFile(req: Request, res: Response): Promise<void> {
 
   if (!ft || !["application/pdf"].includes(ft.mime)) {
     await fs.remove(tmpPath);
-    res.sendStatus(422);
-    return;
+
+    const err: Express.RequestError = new Error("STORAGE:INVALID_MIME");
+    err.statusCode = 415;
+    err.errors = [{ message: "File is of invalid mime type.", code: "STORAGE-415", value: ft!.mime, param: "file" }];
+
+    throw err;
   }
 
   const fileData = { name: originalFileName, path: tmpPath, type: uploadFileType, mime: ft.mime };
@@ -169,8 +173,12 @@ async function uploadRecommendation(req: Request, res: Response): Promise<void> 
 
   if (!ft || !["application/pdf"].includes(ft.mime)) {
     await fs.remove(tmpPath);
-    res.sendStatus(422);
-    return;
+
+    const err: Express.RequestError = new Error("STORAGE:INVALID_MIME");
+    err.statusCode = 415;
+    err.errors = [{ message: "File is of invalid mime type.", code: "STORAGE-415", value: ft!.mime, param: "file" }];
+
+    throw err;
   }
 
   const fileData = { name: originalFileName, path: tmpPath, type: FileType.RecommendationLetter, mime: ft.mime };

@@ -38,7 +38,7 @@ async function isUserApplicant(userID: string, meta: Meta): Promise<boolean> {
   const user = await req.services.User.getByID(userID);
 
   if (user?.type !== UserType.Applicant) {
-    throw new Error();
+    throw new Error("User is not applicant.:USER-001:422");
   }
 
   return true;

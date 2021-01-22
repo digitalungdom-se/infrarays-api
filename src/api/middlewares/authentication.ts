@@ -28,7 +28,7 @@ export async function attachUser(req: Request, _: Response, next: NextFunction):
     }
   }
 
-  return next();
+  next();
 }
 
 export function ensureAuthenticated(req: Request, _: Response, next: NextFunction): void {
@@ -39,8 +39,9 @@ export function ensureAuthenticated(req: Request, _: Response, next: NextFunctio
   // if any thing fails (no header, invalid header, no consumer, etc) fail the request
   const err: Express.RequestError = new Error("UNAUTHORISED");
   err.statusCode = 401;
-  err.customMessage = "UNAUTHORISED";
-  return next(err);
+  err.errors = [{ message: "Requester is not authenticated.", code: "AUTH-001" }];
+
+  next(err);
 }
 
 export function ensureApplicantAuthenticated(req: Request, _: Response, next: NextFunction): void {
@@ -51,8 +52,9 @@ export function ensureApplicantAuthenticated(req: Request, _: Response, next: Ne
   // if any thing fails (no header, invalid header, no consumer, etc) fail the request
   const err: Express.RequestError = new Error("UNAUTHORISED");
   err.statusCode = 401;
-  err.customMessage = "UNAUTHORISED";
-  return next(err);
+  err.errors = [{ message: "Requester is not applicant.", code: "AUTH-002" }];
+
+  next(err);
 }
 
 export async function ensureAdminAuthenticated(req: Request, _: Response, next: NextFunction): Promise<void> {
@@ -63,8 +65,9 @@ export async function ensureAdminAuthenticated(req: Request, _: Response, next: 
   // if any thing fails (no header, invalid header, no consumer, etc) fail the request
   const err: Express.RequestError = new Error("UNAUTHORISED");
   err.statusCode = 401;
-  err.customMessage = "UNAUTHORISED";
-  return next(err);
+  err.errors = [{ message: "Requester is not admin.", code: "AUTH-003" }];
+
+  next(err);
 }
 
 export async function ensureSuperAdminAuthenticated(req: Request, _: Response, next: NextFunction): Promise<void> {
@@ -75,6 +78,7 @@ export async function ensureSuperAdminAuthenticated(req: Request, _: Response, n
   // if any thing fails (no header, invalid header, no consumer, etc) fail the request
   const err: Express.RequestError = new Error("UNAUTHORISED");
   err.statusCode = 401;
-  err.customMessage = "UNAUTHORISED";
-  return next(err);
+  err.errors = [{ message: "Requester is not super admin.", code: "AUTH-004" }];
+
+  next(err);
 }

@@ -8,11 +8,9 @@ declare global {
   export namespace Express {
     export interface RequestError extends Error {
       message: string;
-      customMessage?: string;
       statusCode?: number;
-      status?: number;
       info?: string;
-      errors?: Array<{ msg?: any; param?: string; value?: any }>;
+      errors?: Array<{ message?: any; param?: string; value?: any; code?: string }>;
     }
 
     export interface Request {

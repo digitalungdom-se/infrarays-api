@@ -64,7 +64,7 @@ describe("User", function () {
       expect(response.status).toBe(204);
 
       response = await u.get(`/user/@me/application/file/${fileID}`);
-      expect(response.status).toBe(422);
+      expect(response.status).toBe(404);
     });
   });
 

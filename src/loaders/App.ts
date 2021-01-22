@@ -94,6 +94,7 @@ class App {
     this.app.use(function (_, res, next) {
       const err: Express.RequestError = new Error("ROUTE:NOT_FOUND");
       err.statusCode = 404;
+      err.errors = [{ message: "The route could not be found.", code: "SERVER-404" }];
 
       next(err);
     });
@@ -107,9 +108,10 @@ class App {
       }
 
       err.statusCode = err.statusCode || 500;
+      err.errors = err.errors || [{ message: "An unexpected server error occurred.", code: "SERVER-500" }];
       res.error = err;
 
-      res.sendStatus(err.statusCode);
+      res.status(err.statusCode).json({ errors: err.errors });
       next(err);
     });
 

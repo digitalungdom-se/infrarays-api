@@ -6,8 +6,11 @@ async function newToken(req: Request, res: Response): Promise<void> {
 
   if (req.body.grant_type === "client_credentials") {
     if (!req.headers.authorization || req.headers.authorization.split(" ").length !== 2) {
-      res.sendStatus(401);
-      return;
+      const err: Express.RequestError = new Error("OAUTH:BAD_REQUEST");
+      err.statusCode = 400;
+      err.errors = [{ message: "Authorization header is malformed.", code: "OAUTH-001", value: req.headers.authorization, param: "Authorization" }];
+
+      throw err;
     }
 
     const method = req.headers.authorization.split(" ")[0];
@@ -21,8 +24,11 @@ async function newToken(req: Request, res: Response): Promise<void> {
         break;
 
       default:
-        res.sendStatus(401);
-        return;
+        const err: Express.RequestError = new Error("OAUTH:BAD_REQUEST");
+        err.statusCode = 400;
+        err.errors = [{ message: "Authorization method is not allowed.", code: "OAUTH-002", value: req.headers.authorization, param: "Authorization" }];
+
+        throw err;
     }
   } else if (req.body.grant_type === "refresh_token") {
     const refreshToken = req.body.refresh_token;
@@ -33,8 +39,11 @@ async function newToken(req: Request, res: Response): Promise<void> {
   }
 
   if (!responseToken) {
-    res.sendStatus(401);
-    return;
+    const err: Express.RequestError = new Error("OAUTH:BAD_REQUEST");
+    err.statusCode = 401;
+    err.errors = [{ message: "Could not authorize.", code: "OAUTH-003", value: req.headers.authorization, param: "Authorization" }];
+
+    throw err;
   }
 
   res.status(200).json(responseToken);

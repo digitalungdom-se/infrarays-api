@@ -7,13 +7,14 @@ const createApplicant = [
   body("email")
     .isString()
     .isEmail()
+    .bail()
     .custom(async function (email: string, meta) {
       const req = meta.req as Request;
 
       const user = await req.services.User.getByEmail(email);
 
       if (user) {
-        throw new Error();
+        throw new Error("User already exists with that email.:USER-001:422");
       }
 
       return true;
@@ -29,13 +30,14 @@ const sendEmailLoginCode = [
   body("email")
     .isString()
     .isEmail()
+    .bail()
     .custom(async function (email: string, meta) {
       const req = meta.req as Request;
 
       const user = await req.services.User.getByEmail(email);
 
       if (!user) {
-        throw new Error();
+        throw new Error("User with that email not found.:USER-404:404");
       }
 
       return true;
@@ -52,13 +54,14 @@ const update = [
     .optional()
     .isString()
     .isEmail()
+    .bail()
     .custom(async function (email: string, meta) {
       const req = meta.req as Request;
 
       const user = await req.services.User.getByEmail(email);
 
       if (user) {
-        throw new Error();
+        throw new Error("User already exists with that email.:USER-001:422");
       }
 
       return true;

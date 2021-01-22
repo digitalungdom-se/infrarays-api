@@ -3,37 +3,36 @@ import { ValidationChain, validationResult } from "express-validator";
 
 const customValidationResult = validationResult.withDefaults({
   formatter: error => {
-    return { param: error.param, value: error.value, msg: error.msg };
+    console.log(error);
+
+    const [message, code, statusCode] = (error.msg as string).split(":");
+    if (statusCode) {
+      return { param: error.param, value: error.value, message, code, statusCode: parseInt(statusCode) };
+    } else {
+      return { param: error.param, value: error.value, message: "Simple validation error.", code: "VAL-422" };
+    }
   },
 });
 
 export function validate(validations: Array<ValidationChain>) {
   return async function (req: Request, _: Response, next: NextFunction): Promise<void> {
-    try {
-      await Promise.all(validations.map(validation => validation.run(req)));
-      const errors = customValidationResult(req);
-
-      if (!errors || errors.isEmpty()) {
-        return next();
-      }
-
-      const err: Express.RequestError = new Error("VALIDATION_ERROR");
-      err.customMessage = "VALIDATION_ERROR";
-      err.statusCode = 422;
-      err.errors = errors.array();
-
-      throw err;
-    } catch (error) {
-      if (process.env.LOG_LEVEL === "silly") {
-        const errors = validationResult(req);
-        error.errors = errors.array();
-
-        req.logger.warn("VALIDATION_ERROR", { errors: error.errors });
-      }
-
-      error.statusCode = 422;
-
-      next(error);
+    await Promise.all(validations.map(validation => validation.run(req)));
+    const errors = customValidationResult(req);
+    if (!errors || errors.isEmpty()) {
+      return next();
     }
+
+    const err: Express.RequestError = new Error("VALIDATION_ERROR");
+    err.errors = Object.values(errors.mapped());
+
+    const customError = err.errors.find((error: any) => error.statusCode);
+
+    if (customError) {
+      err.statusCode = (customError as any).statusCode;
+    } else {
+      err.statusCode = 422;
+    }
+
+    next(err);
   };
 }
