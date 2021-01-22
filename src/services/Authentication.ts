@@ -62,6 +62,9 @@ export class AuthenticationService {
       return null;
     }
 
+    if (!user.verified) {
+      await this.User.verify(user.id);
+    }
     const accessToken = this.createToken(user.id);
 
     const refreshToken = await this.Token.createRefreshToken(userID);

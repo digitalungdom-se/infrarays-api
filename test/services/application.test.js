@@ -141,7 +141,6 @@ describe("User", function () {
       expect(response.body.email).toBe(email);
       expect(Math.round(new Date(response.body.lastSent).valueOf() / 1000)).toBe(Math.round(new Date().valueOf() / 1000));
       expect(response.body.received).toBe(null);
-      expect(response.body.fileId).toBe(null);
       expect(response.body.index).toBe(index);
     });
   });
@@ -172,7 +171,6 @@ describe("User", function () {
         expect(recommendation.email).toBe(emails[recommendation.index]);
         expect(Math.round(new Date(recommendation.lastSent).valueOf() / 1000)).toBe(Math.round(sent[recommendation.index] / 1000));
         expect(recommendation.received).toBe(null);
-        expect(recommendation.fileId).toBe(null);
       });
     });
   });

@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import fs from "fs-extra";
 import fileType from "file-type";
 import { promisify } from "util";
-import { FileTypes } from "types";
+import { FileType } from "types";
 
 async function get(req: Request, res: Response): Promise<void> {
   const userID = req.params.userID;
@@ -29,7 +29,11 @@ async function getFiles(req: Request, res: Response): Promise<void> {
 
   const files = await req.services.Storage.getForUser(userID);
 
-  res.json(files);
+  const filesReturn = files.map(file => {
+    return req.services.Storage.toFilePublic(file);
+  });
+
+  res.json(filesReturn);
 }
 
 async function getFile(req: Request, res: Response): Promise<void> {
@@ -66,7 +70,9 @@ async function uploadFile(req: Request, res: Response): Promise<void> {
 
   const file = await req.services.Storage.create(userID, fileData);
 
-  res.status(201).send(file);
+  const fileReturn = req.services.Storage.toFilePublic(file);
+
+  res.status(201).send(fileReturn);
 }
 
 async function deleteFile(req: Request, res: Response): Promise<void> {
@@ -111,7 +117,11 @@ async function getRecommendations(req: Request, res: Response): Promise<void> {
 
   const recommendations = await req.services.Application.getRecommendationsForUser(userID);
 
-  res.json(recommendations);
+  const recommendationsReturn = recommendations.map(recommendation => {
+    return req.services.Application.toRecommendationForUser(recommendation);
+  });
+
+  res.json(recommendationsReturn);
 }
 
 async function sendRecommendationRequest(req: Request, res: Response): Promise<void> {
@@ -123,6 +133,7 @@ async function sendRecommendationRequest(req: Request, res: Response): Promise<v
 
   if (process.env.NODE_ENV === "production") {
     delete recommendation.code;
+    delete recommendation.fileId;
   }
 
   res.status(201).json(recommendation);
@@ -162,11 +173,13 @@ async function uploadRecommendation(req: Request, res: Response): Promise<void> 
     return;
   }
 
-  const fileData = { name: originalFileName, path: tmpPath, type: FileTypes.RecommendationLetter, mime: ft.mime };
+  const fileData = { name: originalFileName, path: tmpPath, type: FileType.RecommendationLetter, mime: ft.mime };
 
   const file = await req.services.Application.uploadRecommendation(recommendationCode, fileData);
 
-  res.status(201).send(file);
+  const fileReturn = req.services.Storage.toFilePublic(file);
+
+  res.status(201).send(fileReturn);
 }
 
 export default { get, getPDF, getFiles, getFile, uploadFile, deleteFile, getSurvey, saveSurvey, getRecommendations, sendRecommendationRequest, deleteRecommendation, getRecommendationByCode, uploadRecommendation };

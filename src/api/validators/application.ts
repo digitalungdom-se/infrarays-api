@@ -3,7 +3,7 @@ import { Request } from "express";
 import validator from "validator";
 
 import { validators } from "utils";
-import { FileTypes } from "types";
+import { FileType } from "types";
 
 const get = [param("userID").isString().isUUID().custom(validators.isUserApplicant)];
 const getPDF = [param("userID").isString().isUUID().custom(validators.isUserApplicant)];
@@ -18,7 +18,7 @@ const getFile = [
       const userID = req.params.userID;
       const file = await req.services.Storage.getByID(fileID);
 
-      if (!file || file.userId !== userID) {
+      if (!file || file.userId !== userID || file.type === FileType.RecommendationLetter) {
         throw new Error();
       }
 
@@ -34,7 +34,7 @@ const uploadFile = [
     .isString()
     .toUpperCase()
     .isIn(["CV", "COVER_LETTER", "ESSAY", "GRADES", "APPENDIX"])
-    .if((fileType: string) => fileType === FileTypes.Appendix)
+    .if((fileType: string) => fileType === FileType.Appendix)
     .custom(async function (fileType: string, meta) {
       const req = meta.req as Request;
       const userID = req.user!.id;
@@ -44,7 +44,7 @@ const uploadFile = [
       let appendixCount = 0;
 
       files.forEach(file => {
-        if (file.type === FileTypes.Appendix) {
+        if (file.type === FileType.Appendix) {
           appendixCount++;
         }
       });

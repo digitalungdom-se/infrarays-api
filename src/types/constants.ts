@@ -9,7 +9,7 @@ export enum TokenType {
   EmailLogin = "EMAIL_LOGIN",
 }
 
-export enum FileTypes {
+export enum FileType {
   CV = "CV",
   CoverLetter = "COVER_LETTER",
   Grades = "GRADES",

@@ -7,9 +7,9 @@ import pdfParse from "pdf-parse";
 import { v4 as uuidv4 } from "uuid";
 
 import database from "types/database";
-import { IApplicantInput, ISurveyInput } from "interfaces";
+import { IApplicantInput, ISurveyInput, IRecommendationByCode, IRecommendationForUser } from "interfaces";
 import { UserService, StorageService, MailService } from "./";
-import { FileTypes, UserType } from "types";
+import { FileType, UserType } from "types";
 import { mergePDFDocuments, randomBase62String } from "utils";
 import { Config } from "configs";
 
@@ -68,17 +68,17 @@ export class ApplicationService {
     });
 
     const fileObject: any = {};
-    fileObject[FileTypes.Appendix] = [];
+    fileObject[FileType.Appendix] = [];
 
     if (opts?.includeRecommendationLetters) {
-      fileObject[FileTypes.RecommendationLetter] = [];
+      fileObject[FileType.RecommendationLetter] = [];
     }
 
     await Promise.all(
       files.map(async file => {
-        if (file.type === FileTypes.RecommendationLetter && opts?.includeRecommendationLetters) {
+        if (file.type === FileType.RecommendationLetter && opts?.includeRecommendationLetters) {
           fileObject[file.type].push(await fs.readFile(file.path));
-        } else if (file.type === FileTypes.Appendix) {
+        } else if (file.type === FileType.Appendix) {
           fileObject[file.type].push(await fs.readFile(file.path));
         } else {
           fileObject[file.type] = await fs.readFile(file.path);
@@ -88,16 +88,16 @@ export class ApplicationService {
 
     const wordCounts = { coverLetter: 0, essay: 0 };
 
-    if (fileObject[FileTypes.CoverLetter]) {
-      wordCounts.coverLetter = (await pdfParse(fileObject[FileTypes.CoverLetter])).text
+    if (fileObject[FileType.CoverLetter]) {
+      wordCounts.coverLetter = (await pdfParse(fileObject[FileType.CoverLetter])).text
         .replace(/[.,?!;()"'-]/g, " ")
         .replace(/\s+/g, " ")
         .toLowerCase()
         .split(" ").length;
     }
 
-    if (fileObject[FileTypes.Essay]) {
-      wordCounts.essay = (await pdfParse(fileObject[FileTypes.Essay])).text
+    if (fileObject[FileType.Essay]) {
+      wordCounts.essay = (await pdfParse(fileObject[FileType.Essay])).text
         .replace(/[.,?!;()"'-]/g, " ")
         .replace(/\s+/g, " ")
         .toLowerCase()
@@ -176,24 +176,24 @@ export class ApplicationService {
 
     pages.push(introDoc);
 
-    if (fileObject[FileTypes.CV]) {
-      pages.push(fileObject[FileTypes.CV]);
+    if (fileObject[FileType.CV]) {
+      pages.push(fileObject[FileType.CV]);
     }
-    if (fileObject[FileTypes.CoverLetter]) {
-      pages.push(fileObject[FileTypes.CoverLetter]);
+    if (fileObject[FileType.CoverLetter]) {
+      pages.push(fileObject[FileType.CoverLetter]);
     }
-    if (fileObject[FileTypes.Essay]) {
-      pages.push(fileObject[FileTypes.Essay]);
+    if (fileObject[FileType.Essay]) {
+      pages.push(fileObject[FileType.Essay]);
     }
-    if (fileObject[FileTypes.Grades]) {
-      pages.push(fileObject[FileTypes.Grades]);
+    if (fileObject[FileType.Grades]) {
+      pages.push(fileObject[FileType.Grades]);
     }
 
     if (opts?.includeRecommendationLetters) {
-      pages.push(...fileObject[FileTypes.RecommendationLetter]);
+      pages.push(...fileObject[FileType.RecommendationLetter]);
     }
 
-    pages.push(...fileObject[FileTypes.Appendix]);
+    pages.push(...fileObject[FileType.Appendix]);
 
     return Buffer.from(await mergePDFDocuments(pages));
   }
@@ -223,7 +223,7 @@ export class ApplicationService {
     return (this.db.recommendations().where({ userId: userID }).select("*") as unknown) as database.Recommendations[];
   }
 
-  public async getRecommendationByCode(code: string): Promise<any | undefined> {
+  public async getRecommendationByCode(code: string): Promise<IRecommendationByCode | undefined> {
     return this.db
       .recommendations()
       .where({ code })
@@ -327,5 +327,16 @@ export class ApplicationService {
     await this.db.surveys().insert(survey);
 
     return survey;
+  }
+
+  public toRecommendationForUser(recommendation: database.Recommendations): IRecommendationForUser {
+    return {
+      id: recommendation.id,
+      userId: recommendation.userId,
+      email: recommendation.email,
+      lastSent: recommendation.lastSent,
+      received: recommendation.received,
+      index: recommendation.index,
+    };
   }
 }

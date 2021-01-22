@@ -5,8 +5,10 @@ import { v4 as uuidv4 } from "uuid";
 import moment from "moment";
 import mime from "mime-types";
 
+import { FileType } from "types";
 import database from "types/database";
 import { Config } from "configs";
+import { IFilePublic } from "interfaces/IStorage";
 
 export class StorageService {
   private readonly db: {
@@ -75,5 +77,16 @@ export class StorageService {
         return await fs.remove(file.path);
       }),
     );
+  }
+
+  public toFilePublic(file: database.Files): IFilePublic {
+    return {
+      id: file.id,
+      userId: file.userId,
+      type: file.type as FileType,
+      created: file.created,
+      name: file.name,
+      mime: file.mime,
+    };
   }
 }

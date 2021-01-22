@@ -75,6 +75,10 @@ export class UserService {
     return user;
   }
 
+  public async verify(userID: string): Promise<void> {
+    await this.db.users().where({ id: userID }).update({ verified: true });
+  }
+
   public async update(id: string, update: IUserUpdate): Promise<database.Users> {
     return (await this.db.users().where({ id }).update(update).returning("*"))[0];
   }
