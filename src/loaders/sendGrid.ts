@@ -1,8 +1,8 @@
-import sgMail, { MailService } from "@sendgrid/mail";
+import sgMail, { MailService as SendGridMailService } from "@sendgrid/mail";
 
 import { Config } from "configs";
 
-function loadMailService(config: typeof Config): MailService {
+function loadSendGridMailService(config: typeof Config): SendGridMailService {
   if (config.isDevelopment) {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     sgMail.send = async (): Promise<any> => {};
@@ -13,4 +13,4 @@ function loadMailService(config: typeof Config): MailService {
   return sgMail;
 }
 
-export { loadMailService };
+export { loadSendGridMailService };

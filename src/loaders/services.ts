@@ -1,15 +1,17 @@
-import { MailService } from "@sendgrid/mail";
+import { MailService as SendGridMailService } from "@sendgrid/mail";
 import knex from "knex";
 import { RedisClient } from "redis";
 
 import { IServices } from "interfaces";
-import { ApplicationService, AuthenticationService, StorageService, TokenService, UserService } from "services";
+import { ApplicationService, AuthenticationService, StorageService, TokenService, UserService, MailService } from "services";
 import { Config } from "configs";
 
-function loadServices(knex: knex, redis: RedisClient, mailService: MailService, config: typeof Config): IServices {
-  const userService = new UserService(knex);
+function loadServices(knex: knex, redis: RedisClient, sendGridMailService: SendGridMailService, config: typeof Config): IServices {
   const tokenService = new TokenService(redis);
   const storageService = new StorageService(knex, config);
+  const mailService = new MailService(sendGridMailService, config);
+
+  const userService = new UserService(knex, storageService);
 
   const services: IServices = {
     Authentication: new AuthenticationService(tokenService, userService, mailService, config),

@@ -1,10 +1,8 @@
 import jwt from "jsonwebtoken";
-import { MailService } from "@sendgrid/mail";
 
 import { Config } from "configs";
 import { IReturnToken } from "interfaces";
-import { TokenService, UserService } from "./";
-import { generateSimpleEmail } from "utils";
+import { TokenService, UserService, MailService } from "./";
 
 export class AuthenticationService {
   constructor(private readonly Token: TokenService, private readonly User: UserService, private readonly Mail: MailService, private readonly config: typeof Config) {}
@@ -52,9 +50,7 @@ export class AuthenticationService {
 
     const emailLoginCode = await this.Token.createEmailLoginToken(user.id);
 
-    const emailData = generateSimpleEmail(email, this.config.sendGrid.emailTemplates.login, { login_code: emailLoginCode });
-
-    await this.Mail.send(emailData);
+    await this.Mail.sendLoginEmail(email, { login_code: emailLoginCode });
 
     return emailLoginCode;
   }

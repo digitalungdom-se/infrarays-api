@@ -61,6 +61,12 @@ export class StorageService {
     await fs.remove(file.path);
   }
 
+  public async delUserFiles(userID: string): Promise<void> {
+    const userDir = path.join(this.config.server.store, userID);
+
+    await fs.remove(userDir);
+  }
+
   public async delFileType(userID: string, fileType: string): Promise<void> {
     const file = await this.db.files().where({ userId: userID, type: fileType }).del().returning("*");
 

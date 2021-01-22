@@ -4,6 +4,7 @@ import moment from "moment";
 
 import database from "types/database";
 import { IUserInput, IUserUpdate } from "interfaces";
+import { StorageService } from "./";
 
 export class UserService {
   private readonly db: {
@@ -14,7 +15,7 @@ export class UserService {
     users: Map<string, database.Users>;
   };
 
-  constructor(private readonly knex: knex) {
+  constructor(private readonly knex: knex, private readonly Storage: StorageService) {
     this.db = {
       users: (): knex.QueryBuilder<database.Users> => this.knex<database.Users>("users"),
     };
@@ -79,6 +80,6 @@ export class UserService {
   }
 
   public async delete(id: string): Promise<void> {
-    await this.db.users().where({ id }).del();
+    await Promise.all([this.db.users().where({ id }).del(), this.Storage.delUserFiles(id)]);
   }
 }

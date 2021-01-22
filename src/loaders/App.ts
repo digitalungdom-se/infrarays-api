@@ -2,7 +2,7 @@ import bodyParser from "body-parser";
 import express from "express";
 import helmet from "helmet";
 import winston from "winston";
-import { MailService } from "@sendgrid/mail";
+import { MailService as SendGridMailService } from "@sendgrid/mail";
 import cors from "cors";
 import "express-async-errors";
 import knex from "knex";
@@ -20,7 +20,7 @@ class App {
   public app: express.Application;
   private server?: Server;
 
-  constructor(private readonly config: typeof Config, public readonly logger: winston.Logger, private readonly knex: knex, private readonly redis: RedisClient, private readonly mailService: MailService) {
+  constructor(private readonly config: typeof Config, public readonly logger: winston.Logger, private readonly knex: knex, private readonly redis: RedisClient, private readonly sendGridMailService: SendGridMailService) {
     this.app = express();
 
     this.init();
@@ -61,7 +61,7 @@ class App {
   private initServices(): void {
     this.app.use((req, _, next) => {
       req.logger = this.logger;
-      req.services = loadServices(this.knex, this.redis, this.mailService, this.config);
+      req.services = loadServices(this.knex, this.redis, this.sendGridMailService, this.config);
 
       next();
     });

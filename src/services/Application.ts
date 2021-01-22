@@ -8,11 +8,10 @@ import { v4 as uuidv4 } from "uuid";
 
 import database from "types/database";
 import { IApplicantInput, ISurveyInput } from "interfaces";
-import { UserService, StorageService } from "./";
+import { UserService, StorageService, MailService } from "./";
 import { FileTypes, UserType } from "types";
-import { mergePDFDocuments, randomBase62String, generateSimpleEmail } from "utils";
+import { mergePDFDocuments, randomBase62String } from "utils";
 import { Config } from "configs";
-import { MailService } from "@sendgrid/mail";
 
 const raysStarPath = path.join(__dirname, "..", "..", "assets", "images", "star.png");
 const duLogoPath = path.join(__dirname, "..", "..", "assets", "images", "du_logo.png");
@@ -285,9 +284,7 @@ export class ApplicationService {
       await this.db.recommendations().insert(recommendation);
     }
 
-    const emailData = generateSimpleEmail(email, this.config.sendGrid.emailTemplates.recommendationRequest, { code: recommendation.code, applicant_first_name: user!.firstName, applicant_last_name: user!.lastName, applicant_email: user!.email });
-
-    await this.Mail.send(emailData);
+    await this.Mail.sendRecommendationRequest(email, { code: recommendation.code, applicant_first_name: user!.firstName, applicant_last_name: user!.lastName, applicant_email: user!.email });
 
     return recommendation;
   }
@@ -307,22 +304,14 @@ export class ApplicationService {
 
     await this.db.recommendations().where({ id: recommendation.id }).update({ received: moment.utc().toDate(), fileId: file.id });
 
-    const recommendationReceivedSender = generateSimpleEmail(
-      recommendation.email,
-      this.config.sendGrid.emailTemplates.recommendationReceivedSender,
-      {
-        code: recommendation.code,
-        applicant_first_name: user!.firstName,
-        applicant_last_name: user!.lastName,
-      },
-      [{ content: (await fs.readFile(file.path)).toString("base64"), filename: file.name, type: file.mime, disposition: "attachment" }],
-    );
-
-    const recommendationReceivedApplicant = generateSimpleEmail(recommendation.email, this.config.sendGrid.emailTemplates.recommendationReceivedApplicant, {
-      sender_email: recommendation.email,
-    });
-
-    await Promise.all([this.Mail.send(recommendationReceivedSender), this.Mail.send(recommendationReceivedApplicant)]);
+    await Promise.all([
+      this.Mail.sendRecommendationReceivedSender(
+        recommendation.email,
+        { code: recommendation.code, applicant_first_name: user!.firstName, applicant_last_name: user!.lastName },
+        { content: (await fs.readFile(file.path)).toString("base64"), filename: file.name, type: file.mime },
+      ),
+      this.Mail.sendRecommendationReceivedApplicant(user!.email, { sender_email: recommendation.email }),
+    ]);
 
     return file;
   }
