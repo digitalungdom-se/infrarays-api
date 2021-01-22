@@ -1,0 +1,9 @@
+# Blacklist everything
+*
+
+# Whitelist
+!src
+!tsconfig.json
+!package.json
+!yarn.lock
+!assets

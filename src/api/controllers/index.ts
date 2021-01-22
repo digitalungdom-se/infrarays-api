@@ -1,9 +1,5 @@
-import { auth } from "./auth";
+import oauth from "./oauth";
 import user from "./user";
-import admin from "./admin";
+import application from "./application";
 
-export default {
-    admin,
-    auth,
-    user,
-};
+export default { oauth, user, application };

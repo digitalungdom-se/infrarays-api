@@ -1,29 +1,38 @@
 {
-    "compilerOptions": {
-        "target": "es6",
-        "module": "commonjs",
+  "compilerOptions": {
+    "lib": ["ES2015"],
+    "module": "commonjs",
+    "target": "ES2015",
 
-        "moduleResolution": "node",
-        "sourceMap": true,
-        "outDir": "./build/",
+    "baseUrl": "./src",
+    //     "rootDir": "src",
+    "moduleResolution": "node",
+    "outDir": "build",
+    "paths": { "*": ["*"] },
+    "sourceMap": false,
 
-        "baseUrl": "src",
-        "paths": { "*": ["*"] },
+    "allowJs": false,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "declaration": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmitOnError": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "pretty": true,
+    "resolveJsonModule": true,
+    "strict": true,
+    "experimentalDecorators": true,
 
-        "noImplicitReturns": false,
-        "noImplicitThis": true,
-        "noImplicitAny": true,
-        "strictNullChecks": true,
-        "esModuleInterop": true,
-
-        "allowJs": false,
-
-        "plugins": [
-            {
-                "transform": "@zerollup/ts-transform-paths"
-            }
-        ]
-    },
-
-    "include": ["src/**/*"]
+    "plugins": [
+      {
+        "transform": "@zerollup/ts-transform-paths"
+      }
+    ]
+  },
+  "exclude": ["node_modules"],
+  "include": ["src/**/*", "test/**/*"]
 }

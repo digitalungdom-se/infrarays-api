@@ -1,25 +1,22 @@
-import * as Knex from 'knex';
+import * as Knex from "knex";
 
 export async function up(knex: Knex): Promise<any> {
-    return knex.schema.createTable('users', function(table) {
-        table.specificType('id', 'char(16)').notNullable().unique().primary().index();
+  return knex.schema.createTable("users", function (table) {
+    table.uuid("id").primary();
 
-        table.string('email', 320).notNullable().unique().index();
+    table.string("email").notNullable().unique().index();
 
-        table.string('password', 128).notNullable();
+    table.string("first_name").notNullable();
+    table.string("last_name").notNullable();
 
-        table.string('name', 256).notNullable();
+    table.string("type").notNullable();
 
-        table.date('birthdate').notNullable();
+    table.boolean("verified").notNullable().defaultTo(false);
 
-        table.boolean('finnish').notNullable();
-
-        table.specificType('recommendations', 'jsonb[]').notNullable();
-
-        table.boolean('verified').notNullable().defaultTo(false);
-    });
+    table.dateTime("created").notNullable();
+  });
 }
 
 export async function down(knex: Knex): Promise<any> {
-    return knex.schema.dropTable('users');
+  return knex.schema.dropTable("users");
 }

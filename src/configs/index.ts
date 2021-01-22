@@ -1,21 +1,50 @@
-import { config } from "dotenv";
+import { config as dotenvConfig } from "dotenv";
 
-process.env.NODE_ENV = process.env.NODE_ENV || "development";
-
-const envFound = config({ path: `${process.env.PWD}/.env` });
+const envFound = dotenvConfig({ path: `${process.env.PWD}/.env` });
 if (!envFound) {
-    throw new Error("⚠ Couldn't find .env file ⚠");
+  throw new Error("Could not find .env file");
 }
 
-export default {
-    env: process.env.NODE_ENV,
+const Config = {
+  isDevelopment: process.env.NODE_ENV === "development",
+  environment: {
+    production: process.env.ENVIRONMENT === "production",
+    sandbox: process.env.ENVIRONMENT === "sandbox",
+    development: process.env.ENVIRONMENT === "development",
+    test: process.env.ENVIRONMENT === "test",
+    staging: process.env.ENVIRONMENT === "staging",
+  },
 
-    port: parseInt(process.env.PORT || "6972", 10),
+  server: {
+    port: parseInt(process.env.PORT || "8080", 10),
+    store: process.env.STORE!,
+  },
 
-    databaseURI: process.env.DATABASE_URI,
+  secret: process.env.SECRET!,
 
-    email: {
-        email: process.env.EMAIL,
-        password: process.env.EMAIL_PASSWORD,
+  logs: {
+    level: process.env.LOG_LEVEL || "silly",
+  },
+
+  psql: {
+    uri: process.env.PSQL_URI!,
+  },
+
+  redis: {
+    uri: process.env.REDIS_URI!,
+  },
+
+  sendGrid: {
+    apiKey: process.env.SEND_GRID_API_KEY!,
+    email: process.env.SEND_GRID_EMAIL!,
+    emailTemplates: {
+      login: process.env.SEND_GRID_TEMPLATE_LOGIN!,
+      recommendationRequest: process.env.SEND_GRID_TEMPLATE_RECOMMENDATION_REQUEST!,
+      recommendationReceivedApplicant: process.env.SEND_GRID_TEMPLATE_RECOMMENDATION_RECEIVED_APPLICANT!,
+      recommendationReceivedSender: process.env.SEND_GRID_TEMPLATE_RECOMMENDATION_RECEIVED_SENDER!,
+      closingReminder: process.env.SEND_GRID_TEMPLATE_CLOSING_REMINDER!,
     },
+  },
 };
+
+export { Config };

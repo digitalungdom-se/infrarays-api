@@ -1,7 +1,8 @@
-import generateCoverPage from "./generateCoverPage";
-import generateID from "./generateID";
-import mapOrder from "./mapOrder";
-import sendMail from "./sendMail";
-import shuffleArray from "./shuffleArray";
-
-export { generateID, generateCoverPage, mapOrder, sendMail, shuffleArray };
+export * from "./string";
+export * from "./sanitizers";
+export * from "./generateEmail";
+export * from "./validators";
+export * from "./cleanObject";
+export * from "./randomWordGenerator";
+export * from "./dateToSeconds";
+export * from "./mergePDF";

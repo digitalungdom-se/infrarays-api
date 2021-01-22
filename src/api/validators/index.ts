@@ -1,7 +1,4 @@
 import user from "./user";
-import admin from "./admin";
+import application from "./application";
 
-export default {
-    admin,
-    user,
-};
+export default { user, application };

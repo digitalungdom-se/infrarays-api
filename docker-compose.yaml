@@ -1,0 +1,55 @@
+version: "3"
+services:
+  infrarays-api:
+    container_name: infrarays-api
+    build:
+      context: .
+    ports:
+      - "8080:80"
+    expose:
+      - "80"
+    networks:
+      - infrarays
+    depends_on:
+      - psql
+      - redis
+    links:
+      - psql
+      - redis
+    env_file: .docker.env
+    # volumes:
+    # - infrarays-api-data:/store
+
+  psql:
+    image: postgres
+    container_name: psql
+    restart: always
+    networks:
+      - infrarays
+    expose:
+      - 5432
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=infrarays
+      - POSTGRES_PASSWORD=infrarays_is_the_best
+      - POSTGRES_DB=infrarays
+    # volumes:
+    # - psql-data:/var/lib/postgresql/data/
+
+  redis:
+    image: redis
+    container_name: redis
+    restart: always
+    command: ["redis-server", "--appendonly", "yes"]
+    networks:
+      - infrarays
+    expose:
+      - 6379
+    ports:
+      - "6379:6379"
+    # volumes:
+    # - redis-data:/data
+
+networks:
+  infrarays:
