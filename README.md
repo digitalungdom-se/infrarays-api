@@ -1,4 +1,1 @@
-# api
-
-## Push to prod
-See `scripts/push.sh`
+# infrarays-api
