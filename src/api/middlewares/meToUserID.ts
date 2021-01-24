@@ -25,7 +25,7 @@ export async function meToUserID(req: Request, _: Response, next: NextFunction):
     // if any thing fails, request fails
     const err: Express.RequestError = new Error("UNAUTHORISED");
     err.statusCode = 401;
-    err.errors = [{ message: "Requester is not authenticated.", code: "AUTH-001" }];
+    err.errors = [{ message: "Requester is not authenticated.", code: "AUTH-001", param: "Authorization" }];
 
     return next(err);
   } else {

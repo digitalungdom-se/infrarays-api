@@ -300,7 +300,9 @@ export class ApplicationService {
   ): Promise<database.Files> {
     const recommendation = (await this.db.recommendations().where({ code: recommendationCode }).select("*").first())!;
 
-    const [user, file] = await Promise.all([this.User.getByID(recommendation.userId), this.Storage.create(recommendation.userId, { ...fileData })]);
+    const fileID = recommendation.fileId || undefined; // overwrite existing recommendation if exists
+
+    const [user, file] = await Promise.all([this.User.getByID(recommendation.userId), this.Storage.create(recommendation.userId, { ...fileData, id: fileID })]);
 
     await this.db.recommendations().where({ id: recommendation.id }).update({ received: moment.utc().toDate(), fileId: file.id });
 

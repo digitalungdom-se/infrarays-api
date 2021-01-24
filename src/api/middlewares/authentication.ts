@@ -39,7 +39,7 @@ export function ensureAuthenticated(req: Request, _: Response, next: NextFunctio
   // if any thing fails (no header, invalid header, no consumer, etc) fail the request
   const err: Express.RequestError = new Error("UNAUTHORISED");
   err.statusCode = 401;
-  err.errors = [{ message: "Requester is not authenticated.", code: "AUTH-001" }];
+  err.errors = [{ message: "Requester is not authenticated.", code: "AUTH-001", param: "Authorization" }];
 
   next(err);
 }
@@ -52,7 +52,7 @@ export function ensureApplicantAuthenticated(req: Request, _: Response, next: Ne
   // if any thing fails (no header, invalid header, no consumer, etc) fail the request
   const err: Express.RequestError = new Error("UNAUTHORISED");
   err.statusCode = 401;
-  err.errors = [{ message: "Requester is not applicant.", code: "AUTH-002" }];
+  err.errors = [{ message: "Requester is not applicant.", code: "AUTH-002", param: "Authorization" }];
 
   next(err);
 }
@@ -65,7 +65,7 @@ export async function ensureAdminAuthenticated(req: Request, _: Response, next: 
   // if any thing fails (no header, invalid header, no consumer, etc) fail the request
   const err: Express.RequestError = new Error("UNAUTHORISED");
   err.statusCode = 401;
-  err.errors = [{ message: "Requester is not admin.", code: "AUTH-003" }];
+  err.errors = [{ message: "Requester is not admin.", code: "AUTH-003", param: "Authorization" }];
 
   next(err);
 }
@@ -78,7 +78,7 @@ export async function ensureSuperAdminAuthenticated(req: Request, _: Response, n
   // if any thing fails (no header, invalid header, no consumer, etc) fail the request
   const err: Express.RequestError = new Error("UNAUTHORISED");
   err.statusCode = 401;
-  err.errors = [{ message: "Requester is not super admin.", code: "AUTH-004" }];
+  err.errors = [{ message: "Requester is not super admin.", code: "AUTH-004", param: "Authorization" }];
 
   next(err);
 }
