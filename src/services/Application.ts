@@ -53,7 +53,7 @@ export class ApplicationService {
           school: "surveys.school",
         })
         .where("applications.userId", applicantID)
-        .fullOuterJoin("surveys", "applications.userId", "surveys.userId")
+        .fullOuterJoin("surveys", "applications.userId", "surveys.applicantId")
         .fullOuterJoin("users", "applications.userId", "users.id")
         .first(),
       this.db.recommendations().where({ applicantId: applicantID }).select("*"),

@@ -39,6 +39,17 @@ describe("User", function () {
     });
   });
 
+  describe("GET /application/:userID/pdf", function () {
+    it("should return 200", async () => {
+      const p = new Profile(request);
+      const u = await p.createApplicant();
+
+      const response = await u.get("/application/@me/pdf");
+
+      expect(response.status).toBe(200);
+    });
+  });
+
   describe("POST /application/:userID/file/:fileType", function () {
     it("should return 200", async () => {
       const p = new Profile(request);
