@@ -52,6 +52,8 @@ export class StorageService {
       mime: fileData.mime,
     };
 
+    await this.db.files().where({ id: fileID }).del();
+
     await this.db.files().insert(file);
 
     return file;
