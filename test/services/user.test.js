@@ -32,6 +32,7 @@ describe("User", function () {
       expect(response.body.email).toBe(u.email);
       expect(response.body.firstName).toBe(u.firstName);
       expect(response.body.lastName).toBe(u.lastName);
+      expect(response.body.type).toBe("APPLICANT");
     });
 
     it("should return 401", async () => {
