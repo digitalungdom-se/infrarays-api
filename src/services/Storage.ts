@@ -40,7 +40,7 @@ export class StorageService {
     const fileName = `${fileID}.${fileExt}`;
     const dest = path.join(this.config.server.store, userID, fileName);
 
-    await fs.move(fileData.path, dest);
+    await fs.move(fileData.path, dest, { overwrite: true });
 
     const file = {
       id: fileID,

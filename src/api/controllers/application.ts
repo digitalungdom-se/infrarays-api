@@ -191,7 +191,7 @@ async function uploadRecommendation(req: Request, res: Response): Promise<void> 
 
     const err: Express.RequestError = new Error("STORAGE:INVALID_MIME");
     err.statusCode = 415;
-    err.errors = [{ message: "File is of invalid mime type.", code: "STORAGE-415", value: ft!.mime, param: "file" }];
+    err.errors = [{ message: "File is of invalid mime type.", code: "STORAGE-415", value: ft?.mime, param: "file" }];
 
     throw err;
   }
