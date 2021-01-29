@@ -35,9 +35,9 @@ export class ApplicationService {
     return this.db.applications().where({ userId: userID }).select("*").first();
   }
 
-  public async getPDF(userID: string, opts?: { includeRecommendationLetters?: boolean }): Promise<Buffer> {
+  public async getPDF(applicantID: string, opts?: { includeRecommendationLetters?: boolean }): Promise<Buffer> {
     const [files, userApplication, recommendations] = await Promise.all([
-      this.Storage.getForUser(userID),
+      this.Storage.getForUser(applicantID),
       this.db
         .applications()
         .select({
@@ -52,11 +52,11 @@ export class ApplicationService {
           city: "surveys.city",
           school: "surveys.school",
         })
-        .where("applications.userId", userID)
+        .where("applications.userId", applicantID)
         .fullOuterJoin("surveys", "applications.userId", "surveys.userId")
         .fullOuterJoin("users", "applications.userId", "users.id")
         .first(),
-      this.db.recommendations().where({ userId: userID }).select("*"),
+      this.db.recommendations().where({ applicantId: applicantID }).select("*"),
     ]);
 
     const recommendationEmails = (recommendations as database.Recommendations[]).map(recommendation => {
@@ -219,8 +219,8 @@ export class ApplicationService {
     return user;
   }
 
-  public async getRecommendationsForUser(userID: string): Promise<database.Recommendations[]> {
-    return (this.db.recommendations().where({ userId: userID }).select("*") as unknown) as database.Recommendations[];
+  public async getRecommendationsForApplicant(applicantID: string): Promise<database.Recommendations[]> {
+    return (this.db.recommendations().where({ applicantId: applicantID }).select("*") as unknown) as database.Recommendations[];
   }
 
   public async getRecommendationByCode(code: string): Promise<IRecommendationByCode | undefined> {
@@ -234,10 +234,10 @@ export class ApplicationService {
         lastSent: "recommendations.lastSent",
         received: "recommendations.received",
 
-        userId: "users.id",
-        userEmail: "users.email",
-        userFirstName: "users.firstName",
-        userLastName: "users.lastName",
+        applicantId: "users.id",
+        applicantEmail: "users.email",
+        applicantFirstName: "users.firstName",
+        applicantLastName: "users.lastName",
 
         fileId: "files.id",
         fileType: "files.type",
@@ -245,21 +245,21 @@ export class ApplicationService {
         fileName: "files.name",
         fileMime: "files.mime",
       })
-      .fullOuterJoin("users", "recommendations.userId", "users.id")
+      .fullOuterJoin("users", "recommendations.applicantId", "users.id")
       .fullOuterJoin("files", "recommendations.fileId", "files.id")
       .first();
   }
 
-  public async deleteRecommendationByUserID(userID: string, index: number): Promise<void> {
-    const fileID = (await this.db.recommendations().where({ userId: userID, index }).del().returning("fileId"))[0];
+  public async deleteRecommendationByApplicantID(applicantID: string, index: number): Promise<void> {
+    const fileID = (await this.db.recommendations().where({ applicantId: applicantID, index }).del().returning("fileId"))[0];
 
     if (fileID) {
       await this.Storage.del(fileID);
     }
   }
 
-  public async sendRecommendationRequest(userID: string, index: number, email: string): Promise<database.Recommendations> {
-    const [recommendationExits, user] = await Promise.all([this.db.recommendations().where({ userId: userID, index }).select("*").first(), this.User.getByID(userID)]);
+  public async sendRecommendationRequest(applicantID: string, index: number, email: string): Promise<database.Recommendations> {
+    const [recommendationExits, user] = await Promise.all([this.db.recommendations().where({ applicantId: applicantID, index }).select("*").first(), this.User.getByID(applicantID)]);
     let recommendation;
 
     if (recommendationExits && recommendationExits.email === email) {
@@ -273,7 +273,7 @@ export class ApplicationService {
       recommendation = {
         id: uuidv4(),
         code: randomBase62String(32),
-        userId: userID,
+        applicantId: applicantID,
         email,
         lastSent: moment.utc().toDate(),
         received: null,
@@ -302,7 +302,7 @@ export class ApplicationService {
 
     const fileID = recommendation.fileId || undefined; // overwrite existing recommendation if exists
 
-    const [user, file] = await Promise.all([this.User.getByID(recommendation.userId), this.Storage.create(recommendation.userId, { ...fileData, id: fileID })]);
+    const [user, file] = await Promise.all([this.User.getByID(recommendation.applicantId), this.Storage.create(recommendation.applicantId, { ...fileData, id: fileID })]);
 
     await this.db.recommendations().where({ id: recommendation.id }).update({ received: moment.utc().toDate(), fileId: file.id });
 
@@ -318,14 +318,14 @@ export class ApplicationService {
     return file;
   }
 
-  public async getSurveyByUserID(userID: string): Promise<database.Surveys | undefined> {
-    return this.db.surveys().where({ userId: userID }).select("*").first();
+  public async getSurveyByUserID(applicantID: string): Promise<database.Surveys | undefined> {
+    return this.db.surveys().where({ applicantId: applicantID }).select("*").first();
   }
 
-  public async saveSurvey(userID: string, surveyData: ISurveyInput): Promise<database.Surveys> {
-    await this.db.surveys().where({ userId: userID }).del();
+  public async saveSurvey(applicantID: string, surveyData: ISurveyInput): Promise<database.Surveys> {
+    await this.db.surveys().where({ applicantId: applicantID }).del();
 
-    const survey = { userId: userID, ...surveyData, created: moment.utc().toDate() };
+    const survey = { applicantId: applicantID, ...surveyData, created: moment.utc().toDate() };
     await this.db.surveys().insert(survey);
 
     return survey;
@@ -334,7 +334,7 @@ export class ApplicationService {
   public toRecommendationForUser(recommendation: database.Recommendations): IRecommendationForUser {
     return {
       id: recommendation.id,
-      userId: recommendation.userId,
+      applicantId: recommendation.applicantId,
       email: recommendation.email,
       lastSent: recommendation.lastSent,
       received: recommendation.received,

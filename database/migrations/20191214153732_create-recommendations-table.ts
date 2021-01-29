@@ -5,8 +5,8 @@ export async function up(knex: Knex): Promise<any> {
     table.uuid("id").primary();
     table.string("code").notNullable().index().unique();
 
-    table.uuid("user_id").notNullable();
-    table.foreign("user_id").references("users.id").onDelete("CASCADE");
+    table.uuid("applicant_id").notNullable();
+    table.foreign("applicant_id").references("users.id").onDelete("CASCADE");
 
     table.string("email").notNullable();
 
@@ -19,9 +19,9 @@ export async function up(knex: Knex): Promise<any> {
 
     table.specificType("index", "smallint").unsigned().notNullable();
 
-    table.unique(["user_id", "email"]);
-    table.unique(["user_id", "index"]);
-    table.index(["user_id", "index"]);
+    table.unique(["applicant_id", "email"]);
+    table.unique(["applicant_id", "index"]);
+    table.index(["applicant_id", "index"]);
   });
 }
 

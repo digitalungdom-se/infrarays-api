@@ -28,10 +28,10 @@ export interface IRecommendationByCode {
   lastSent: Date;
   received: Date | null;
 
-  userId: string;
-  userEmail: string;
-  userFirstName: string;
-  userLastName: string;
+  applicantId: string;
+  applicantEmail: string;
+  applicantFirstName: string;
+  applicantLastName: string;
 
   fileId: string | null;
   fileType: FileType | null;
@@ -42,7 +42,7 @@ export interface IRecommendationByCode {
 
 export interface IRecommendationForUser {
   id: string;
-  userId: string;
+  applicantId: string;
   email: string;
   lastSent: Date;
   received: Date | null;

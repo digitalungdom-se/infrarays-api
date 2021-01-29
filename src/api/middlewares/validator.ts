@@ -3,13 +3,11 @@ import { ValidationChain, validationResult } from "express-validator";
 
 const customValidationResult = validationResult.withDefaults({
   formatter: error => {
-    console.log(error);
-
     const [message, code, statusCode] = (error.msg as string).split(":");
     if (statusCode) {
       return { param: error.param, value: error.value, message, code, statusCode: parseInt(statusCode) };
     } else {
-      return { param: error.param, value: error.value, message: "Simple validation error.", code: "VAL-422" };
+      return { param: error.param, value: error.value, message: "Simple validation error.", code: "VALIDATION-422" };
     }
   },
 });

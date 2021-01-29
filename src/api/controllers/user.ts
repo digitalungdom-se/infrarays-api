@@ -1,20 +1,6 @@
 import { Request, Response } from "express";
 import { cleanObject } from "utils";
 
-async function createApplicant(req: Request, res: Response): Promise<void> {
-  const applicantData = {
-    email: req.body.email,
-    firstName: req.body.firstName,
-    lastName: req.body.lastName,
-    birthdate: req.body.birthdate,
-    finnish: req.body.finnish,
-  };
-
-  const user = await req.services.Application.create(applicantData);
-
-  res.status(201).send(user);
-}
-
 async function sendEmailLoginCode(req: Request, res: Response): Promise<void> {
   const email = req.body.email;
 
@@ -28,13 +14,13 @@ async function sendEmailLoginCode(req: Request, res: Response): Promise<void> {
   res.sendStatus(204);
 }
 
-async function get(req: Request, res: Response): Promise<void> {
+async function getByID(req: Request, res: Response): Promise<void> {
   const userID = req.params.userID;
 
   const user = await req.services.User.getByID(userID);
 
   if (user) {
-    res.send(user);
+    res.json(user);
   } else {
     res.sendStatus(404);
   }
@@ -61,7 +47,7 @@ async function update(req: Request, res: Response): Promise<void> {
 
   const user = await req.services.User.update(userID, userData);
 
-  res.send(user);
+  res.json(user);
 }
 
-export default { createApplicant, sendEmailLoginCode, get, del, update };
+export default { sendEmailLoginCode, getByID, del, update };

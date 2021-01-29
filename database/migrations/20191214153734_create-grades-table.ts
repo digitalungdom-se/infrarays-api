@@ -7,19 +7,19 @@ export async function up(knex: Knex): Promise<any> {
     table.uuid("admin_id").notNullable().index();
     table.foreign("admin_id").references("users.id").onDelete("CASCADE");
 
-    table.uuid("user_id").notNullable().index();
-    table.foreign("user_id").references("users.id").onDelete("CASCADE");
+    table.uuid("applicant_id").notNullable().index();
+    table.foreign("applicant_id").references("users.id").onDelete("CASCADE");
 
     table.specificType("cv", "smallint").unsigned().notNullable();
-    table.specificType("coverLetter", "smallint").unsigned().notNullable();
-    table.specificType("essay", "smallint").unsigned().notNullable();
-    table.specificType("grade", "smallint").unsigned().notNullable();
-    table.specificType("recommendation", "smallint").unsigned().notNullable();
+    table.specificType("cover_letter", "smallint").unsigned().notNullable();
+    table.specificType("essays", "smallint").unsigned().notNullable();
+    table.specificType("grades", "smallint").unsigned().notNullable();
+    table.specificType("recommendations", "smallint").unsigned().notNullable();
     table.specificType("overall", "smallint").unsigned().notNullable();
 
-    table.string("comment");
+    table.string("comment").nullable();
 
-    table.unique(["admin_id", "user_id"]);
+    table.unique(["admin_id", "applicant_id"]);
   });
 }
 

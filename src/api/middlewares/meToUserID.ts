@@ -14,10 +14,11 @@ export async function meToUserID(req: Request, _: Response, next: NextFunction):
       } else {
         // if it is not @me (thus uuid) make sure that the requester is authorized (admin/superAdmin)
         if (req.user.type === UserType.Admin || req.user.type === UserType.SuperAdmin) {
-          // only allow admins to GET/OPTION
-          if (["GET", "OPTION"].includes(req.method) || req.user.type === UserType.SuperAdmin) {
-            return next();
-          }
+          return next();
+          // FIX: only allow admins to GET/OPTION application routes
+          // if (["GET", "OPTION"].includes(req.method) || req.user.type === UserType.SuperAdmin) {
+          //   return next();
+          // }
         }
       }
     }
@@ -25,7 +26,7 @@ export async function meToUserID(req: Request, _: Response, next: NextFunction):
     // if any thing fails, request fails
     const err: Express.RequestError = new Error("UNAUTHORISED");
     err.statusCode = 401;
-    err.errors = [{ message: "Requester is not authenticated.", code: "AUTH-001", param: "Authorization" }];
+    err.errors = [{ message: "Requester cannot request using userID.", code: "AUTH-005", param: "Authorization" }];
 
     return next(err);
   } else {

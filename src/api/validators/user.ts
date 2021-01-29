@@ -1,30 +1,5 @@
-import { body, param } from "express-validator";
+import { body, param, query } from "express-validator";
 import { Request } from "express";
-
-import { validators, sanitizers } from "utils";
-
-const createApplicant = [
-  body("email")
-    .isString()
-    .isEmail()
-    .bail()
-    .custom(async function (email: string, meta) {
-      const req = meta.req as Request;
-
-      const user = await req.services.User.getByEmail(email);
-
-      if (user) {
-        throw new Error("User already exists with that email.:USER-001:422");
-      }
-
-      return true;
-    }),
-
-  body("firstName").isString().isLength({ min: 1, max: 256 }),
-  body("lastName").isString().isLength({ min: 1, max: 256 }),
-  body("birthdate").isString().custom(validators.isDate).customSanitizer(sanitizers.toDate),
-  body("finnish").isBoolean().toBoolean(),
-];
 
 const sendEmailLoginCode = [
   body("email")
@@ -44,7 +19,7 @@ const sendEmailLoginCode = [
     }),
 ];
 
-const get = [param("userID").isString().isUUID()];
+const getByID = [param("userID").isString().isUUID()];
 
 const del = [param("userID").isString().isUUID()];
 
@@ -73,4 +48,4 @@ const update = [
   // body("finnish").optional().isBoolean().toBoolean(),
 ];
 
-export default { createApplicant, sendEmailLoginCode, get, del, update };
+export default { sendEmailLoginCode, getByID, del, update };

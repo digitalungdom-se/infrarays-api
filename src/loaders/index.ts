@@ -7,12 +7,7 @@ import { loadSendGridMailService } from "./sendGrid";
 import { loadRedis } from "./redis";
 
 async function load(config: typeof Config): Promise<App> {
-  const logger = loadLogger(config);
-
-  const psql = loadPSQL();
-  const redis = loadRedis(config);
-
-  const sendGridMailService = loadSendGridMailService(config);
+  const [logger, psql, redis, sendGridMailService] = await Promise.all([loadLogger(config), loadPSQL(config), loadRedis(config), loadSendGridMailService(config)]);
 
   const app = new App(config, logger, psql, redis, sendGridMailService);
 

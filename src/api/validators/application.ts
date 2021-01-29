@@ -2,11 +2,36 @@ import { body, param } from "express-validator";
 import { Request } from "express";
 import validator from "validator";
 
-import { validators } from "utils";
+import { validators, sanitizers } from "utils";
 import { FileType } from "types";
 
 const get = [param("userID").isString().isUUID().custom(validators.isUserApplicant)];
+
+const createApplicant = [
+  body("email")
+    .isString()
+    .isEmail()
+    .bail()
+    .custom(async function (email: string, meta) {
+      const req = meta.req as Request;
+
+      const user = await req.services.User.getByEmail(email);
+
+      if (user) {
+        throw new Error("User already exists with that email.:USER-001:422");
+      }
+
+      return true;
+    }),
+
+  body("firstName").isString().isLength({ min: 1, max: 256 }),
+  body("lastName").isString().isLength({ min: 1, max: 256 }),
+  body("birthdate").isString().custom(validators.isDate).customSanitizer(sanitizers.toDate),
+  body("finnish").isBoolean().toBoolean(),
+];
+
 const getPDF = [param("userID").isString().isUUID().custom(validators.isUserApplicant)];
+
 const getFile = [
   param("userID").isString().isUUID().custom(validators.isUserApplicant),
   param("fileID")
@@ -103,7 +128,7 @@ const sendRecommendationRequest = [
 
       const userID = req.params.userID;
 
-      const recommendations = await req.services.Application.getRecommendationsForUser(userID);
+      const recommendations = await req.services.Application.getRecommendationsForApplicant(userID);
 
       recommendations.forEach(recommendation => {
         if (validator.normalizeEmail(recommendation.email) === validator.normalizeEmail(email) && recommendation.index !== +req.params.index) {
@@ -137,4 +162,4 @@ const uploadRecommendation = [
     }),
 ];
 
-export default { get, getPDF, getFile, getFiles, uploadFile, deleteFile, getSurvey, saveSurvey, sendRecommendationRequest, deleteRecommendation, getRecommendationByCode, uploadRecommendation };
+export default { get, createApplicant, getPDF, getFile, getFiles, uploadFile, deleteFile, getSurvey, saveSurvey, sendRecommendationRequest, deleteRecommendation, getRecommendationByCode, uploadRecommendation };

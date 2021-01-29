@@ -2,8 +2,8 @@ import * as Knex from "knex";
 
 export async function up(knex: Knex): Promise<any> {
   return knex.schema.createTable("surveys", function (table) {
-    table.uuid("user_id").primary();
-    table.foreign("user_id").references("users.id").onDelete("CASCADE");
+    table.uuid("applicant_id").primary();
+    table.foreign("applicant_id").references("users.id").onDelete("CASCADE");
 
     table.string("city").notNullable();
     table.string("school").notNullable();

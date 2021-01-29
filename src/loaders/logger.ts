@@ -46,8 +46,8 @@ function httpLogger(logger: winston.Logger): express.Handler {
         size: req.socket.bytesRead,
       };
 
-      if (req.user?.id) {
-        meta.req.user = req.user.id;
+      if (req.user) {
+        meta.req.user = req.user;
       }
 
       meta.res = {
@@ -100,8 +100,8 @@ function httpErrorLogger(logger: winston.Logger): express.ErrorRequestHandler {
         headers: req.headers,
       };
 
-      if (req.user?.id) {
-        meta.req.user = req.user.id;
+      if (req.user) {
+        meta.req.user = req.user;
       }
 
       meta.res = {

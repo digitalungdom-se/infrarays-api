@@ -3,7 +3,7 @@ import knex from "knex";
 import { RedisClient } from "redis";
 
 import { IServices } from "interfaces";
-import { ApplicationService, AuthenticationService, StorageService, TokenService, UserService, MailService } from "services";
+import { ApplicationService, AuthenticationService, StorageService, TokenService, UserService, MailService, AdminService } from "services";
 import { Config } from "configs";
 
 function loadServices(knex: knex, redis: RedisClient, sendGridMailService: SendGridMailService, config: typeof Config): IServices {
@@ -16,6 +16,7 @@ function loadServices(knex: knex, redis: RedisClient, sendGridMailService: SendG
   const services: IServices = {
     Authentication: new AuthenticationService(tokenService, userService, mailService, config),
     Application: new ApplicationService(knex, userService, storageService, mailService, config),
+    Admin: new AdminService(knex, userService),
     User: userService,
     Storage: storageService,
   };

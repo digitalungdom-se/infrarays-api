@@ -9,7 +9,21 @@ async function get(req: Request, res: Response): Promise<void> {
 
   const application = await req.services.Application.getByUserID(userID);
 
-  res.send(application);
+  res.json(application);
+}
+
+async function createApplicant(req: Request, res: Response): Promise<void> {
+  const applicantData = {
+    email: req.body.email,
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+    birthdate: req.body.birthdate,
+    finnish: req.body.finnish,
+  };
+
+  const user = await req.services.Application.create(applicantData);
+
+  res.status(201).send(user);
 }
 
 async function getPDF(req: Request, res: Response): Promise<void> {
@@ -119,7 +133,7 @@ async function saveSurvey(req: Request, res: Response): Promise<void> {
 async function getRecommendations(req: Request, res: Response): Promise<void> {
   const userID = req.params.userID;
 
-  const recommendations = await req.services.Application.getRecommendationsForUser(userID);
+  const recommendations = await req.services.Application.getRecommendationsForApplicant(userID);
 
   const recommendationsReturn = recommendations.map(recommendation => {
     return req.services.Application.toRecommendationForUser(recommendation);
@@ -147,7 +161,7 @@ async function deleteRecommendation(req: Request, res: Response): Promise<void> 
   const userID = req.params.userID;
   const index = (req.params.recommendationIndex as unknown) as number;
 
-  await req.services.Application.deleteRecommendationByUserID(userID, index);
+  await req.services.Application.deleteRecommendationByApplicantID(userID, index);
 
   res.sendStatus(204);
 }
@@ -190,4 +204,10 @@ async function uploadRecommendation(req: Request, res: Response): Promise<void> 
   res.status(201).send(fileReturn);
 }
 
-export default { get, getPDF, getFiles, getFile, uploadFile, deleteFile, getSurvey, saveSurvey, getRecommendations, sendRecommendationRequest, deleteRecommendation, getRecommendationByCode, uploadRecommendation };
+async function getApplicants(req: Request, res: Response): Promise<void> {
+  const applicants = await req.services.User.getApplicants();
+
+  res.json(applicants);
+}
+
+export default { get, createApplicant, getPDF, getFiles, getFile, uploadFile, deleteFile, getSurvey, saveSurvey, getRecommendations, sendRecommendationRequest, deleteRecommendation, getRecommendationByCode, uploadRecommendation, getApplicants };

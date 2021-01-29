@@ -21,46 +21,52 @@ r.get("/health").controller(async (req, res) => {
 });
 
 // user
+// admins can do GET and OPTION
+// super-admins can do every thing
+// if userID = @me => userID gets set to JWT userID
 r.post("/user/oauth/token").controller(controllers.oauth.newToken);
 r.post("/user/oauth/revoke").controller(controllers.oauth.revokeToken);
 
 r.post("/user/send_email_login_code").validator(validators.user.sendEmailLoginCode).controller(controllers.user.sendEmailLoginCode);
 
-r.post("/user").validator(validators.user.createApplicant).controller(controllers.user.createApplicant);
 r.delete("/user/:userID").ensureAuth().validator(validators.user.del).controller(controllers.user.del);
-r.get("/user/:userID").ensureAuth().validator(validators.user.get).controller(controllers.user.get);
+r.get("/user/:userID").ensureAuth().validator(validators.user.getByID).controller(controllers.user.getByID);
 r.patch("/user/:userID").ensureAuth().validator(validators.user.update).controller(controllers.user.update);
 
-r.get("/user/:userID/application").ensureAuth().validator(validators.application.get).controller(controllers.application.get);
-r.get("/user/:userID/application/pdf").ensureAuth().validator(validators.application.getPDF).controller(controllers.application.getPDF);
+// Application
+r.post("/application").validator(validators.application.createApplicant).controller(controllers.application.createApplicant);
+r.get("/application/:userID").ensureAuth().validator(validators.application.get).controller(controllers.application.get);
+r.get("/application/:userID/pdf").ensureAuth().validator(validators.application.getPDF).controller(controllers.application.getPDF);
 
-r.get("/user/:userID/application/file").ensureAuth().validator(validators.application.getFiles).controller(controllers.application.getFiles);
-r.post("/user/:userID/application/file/:fileType").ensureAuth().file("file").validator(validators.application.uploadFile).controller(controllers.application.uploadFile);
-r.get("/user/:userID/application/file/:fileID").ensureAuth().validator(validators.application.getFile).controller(controllers.application.getFile);
-r.delete("/user/:userID/application/file/:fileID").ensureAuth().validator(validators.application.deleteFile).controller(controllers.application.deleteFile);
+r.get("/application/:userID/file").ensureAuth().validator(validators.application.getFiles).controller(controllers.application.getFiles);
+r.post("/application/:userID/file/:fileType").ensureAuth().file("file").validator(validators.application.uploadFile).controller(controllers.application.uploadFile);
+r.get("/application/:userID/file/:fileID").ensureAuth().validator(validators.application.getFile).controller(controllers.application.getFile);
+r.delete("/application/:userID/file/:fileID").ensureAuth().validator(validators.application.deleteFile).controller(controllers.application.deleteFile);
 
-r.get("/user/:userID/application/survey").ensureAuth().validator(validators.application.getSurvey).controller(controllers.application.getSurvey);
-r.post("/user/:userID/application/survey").ensureAuth().validator(validators.application.saveSurvey).controller(controllers.application.saveSurvey);
+r.get("/application/:userID/survey").ensureAuth().validator(validators.application.getSurvey).controller(controllers.application.getSurvey);
+r.post("/application/:userID/survey").ensureAuth().validator(validators.application.saveSurvey).controller(controllers.application.saveSurvey);
 
-r.get("/user/:userID/application/recommendation").ensureAuth().controller(controllers.application.getRecommendations);
-r.post("/user/:userID/application/recommendation/:recommendationIndex").ensureAuth().validator(validators.application.sendRecommendationRequest).controller(controllers.application.sendRecommendationRequest);
-r.delete("/user/:userID/application/recommendation/:recommendationIndex").ensureAuth().validator(validators.application.deleteRecommendation).controller(controllers.application.deleteRecommendation);
+r.get("/application/:userID/recommendation").ensureAuth().controller(controllers.application.getRecommendations);
+r.post("/application/:userID/recommendation/:recommendationIndex").ensureAuth().validator(validators.application.sendRecommendationRequest).controller(controllers.application.sendRecommendationRequest);
+r.delete("/application/:userID/recommendation/:recommendationIndex").ensureAuth().validator(validators.application.deleteRecommendation).controller(controllers.application.deleteRecommendation);
 
 r.get("/application/recommendation/:recommendationCode").validator(validators.application.getRecommendationByCode).controller(controllers.application.getRecommendationByCode);
 r.post("/application/recommendation/:recommendationCode").file("file").validator(validators.application.uploadRecommendation).controller(controllers.application.uploadRecommendation);
 
-// admins
-r.get("/user").ensureAdminAuth();
-r.get("/admin").ensureAdminAuth();
+// admin specific application
+r.get("/application").ensureAdminAuth().controller(controllers.application.getApplicants);
+r.post("/application/:userID/grade").ensureAdminAuth().validator(validators.admin.grade).controller(controllers.admin.grade);
+r.get("/application/:userID/grade").ensureAdminAuth().validator(validators.admin.getGradesForApplicant).controller(controllers.admin.getGradesForApplicant);
 
-r.post("/user/:userID/grade").ensureAdminAuth();
-r.get("/user/:userID/grade").ensureAdminAuth();
+// admin
+r.get("/admin").ensureAdminAuth().validator(validators.admin.get).controller(controllers.admin.get);
 
-r.post("/admin/randomise_grading_order").ensureAdminAuth();
-r.get("/admin/grading").ensureAdminAuth();
-r.get("/admin/survey").ensureAdminAuth();
+r.post("/admin/grading/randomise").ensureAdminAuth().controller(controllers.admin.randomiseGradingOrder);
+r.get("/admin/grading").ensureAdminAuth().controller(controllers.admin.getGradingOrder);
+
+r.get("/admin/survey").ensureAdminAuth().controller(controllers.admin.getSurveys);
 
 // Super admins
-r.post("/admin").ensureSuperAdminAuth();
+r.post("/admin").ensureSuperAdminAuth().validator(validators.admin.create).controller(controllers.admin.create);
 
 export default r.export();

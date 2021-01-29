@@ -9,7 +9,7 @@ export async function up(knex: Knex): Promise<any> {
     table.string("first_name").notNullable();
     table.string("last_name").notNullable();
 
-    table.string("type").notNullable();
+    table.string("type").notNullable().index();
 
     table.boolean("verified").notNullable().defaultTo(false);
 

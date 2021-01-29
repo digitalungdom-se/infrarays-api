@@ -1,5 +1,4 @@
 const supertest = require("supertest");
-const { v4 } = require("uuid");
 const Profile = require("../profile");
 
 const request = supertest("http://localhost:8080");
@@ -8,9 +7,9 @@ describe("OAUTH", function () {
   describe("POST /user/oauth/token", function () {
     it("should return 200 for client_credentials", async () => {
       const p = new Profile(request);
-      const u = p.newUser();
+      const u = p.newApplicant();
 
-      await request.post("/user").send(u.getUser());
+      await request.post("/application").send(u.getUser());
 
       const codeResp = await request.post("/user/send_email_login_code").send({ email: u.email });
 
@@ -27,9 +26,9 @@ describe("OAUTH", function () {
 
     it("should return 200 for refresh token", async () => {
       const p = new Profile(request);
-      const u = p.newUser();
+      const u = p.newApplicant();
 
-      await request.post("/user").send(u.getUser());
+      await request.post("/application").send(u.getUser());
 
       const codeResp = await request.post("/user/send_email_login_code").send({ email: u.email });
 
