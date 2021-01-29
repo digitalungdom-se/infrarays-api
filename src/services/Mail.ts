@@ -34,4 +34,8 @@ export class MailService {
   public async sendRecommendationReceivedApplicant(to: string, data: { sender_email: string }): Promise<void> {
     await this.sendEmail(to, this.config.sendGrid.emailTemplates.recommendationReceivedApplicant, data);
   }
+
+  public async sendClosingReminder(to: string, data: { first_name: string; last_name: string; time: string }, applicationPDF: { content: string; filename: string; type: string }): Promise<void> {
+    await this.sendEmail(to, this.config.sendGrid.emailTemplates.closingReminder, data, [{ ...applicationPDF, disposition: "attachment" }]);
+  }
 }

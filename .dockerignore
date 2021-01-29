@@ -7,3 +7,4 @@
 !package.json
 !yarn.lock
 !assets
+!pm2.json

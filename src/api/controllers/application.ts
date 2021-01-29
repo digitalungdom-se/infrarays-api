@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import fs from "fs-extra";
 import fileType from "file-type";
 import { promisify } from "util";
-import { FileType } from "types";
+import { FileType, UserType } from "types";
 
 async function get(req: Request, res: Response): Promise<void> {
   const userID = req.params.userID;
@@ -28,8 +28,9 @@ async function createApplicant(req: Request, res: Response): Promise<void> {
 
 async function getPDF(req: Request, res: Response): Promise<void> {
   const userID = req.params.userID;
+  const isAdmin = req.user?.type === UserType.Admin || req.user?.type === UserType.SuperAdmin;
 
-  const [applicationPDFBuffer, user] = await Promise.all([req.services.Application.getPDF(userID), req.services.User.getByID(userID)]);
+  const [applicationPDFBuffer, user] = await Promise.all([req.services.Application.getPDF(userID, { includeRecommendationLetters: isAdmin }), req.services.User.getByID(userID)]);
 
   const fileName = `${user!.firstName.toLowerCase()}_${user!.lastName.toLowerCase()}.pdf`.replace(" ", "_");
 

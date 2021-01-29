@@ -5,11 +5,14 @@ import { loadPSQL } from "./psql";
 import { loadLogger } from "./logger";
 import { loadSendGridMailService } from "./sendGrid";
 import { loadRedis } from "./redis";
+import { loadJobs } from "./jobs";
 
 async function load(config: typeof Config): Promise<App> {
-  const [logger, psql, redis, sendGridMailService] = await Promise.all([loadLogger(config), loadPSQL(config), loadRedis(config), loadSendGridMailService(config)]);
+  const [logger, knex, redis, sendGridMailService] = await Promise.all([loadLogger(config), loadPSQL(config), loadRedis(config), loadSendGridMailService(config)]);
 
-  const app = new App(config, logger, psql, redis, sendGridMailService);
+  loadJobs(knex, redis, sendGridMailService, config, logger);
+
+  const app = new App(config, logger, knex, redis, sendGridMailService);
 
   return app;
 }

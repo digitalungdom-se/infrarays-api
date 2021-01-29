@@ -62,8 +62,6 @@ class Profile {
 
     this.superAdmins.push(superAdmin);
 
-    console.log(superAdmin.accessToken);
-
     return superAdmin;
   }
 

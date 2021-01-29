@@ -1,6 +1,8 @@
-FROM node:latest
+FROM node:current
 
 WORKDIR /app
+
+RUN npm install pm2 -g 
 
 COPY package.json yarn.lock ./
 
@@ -10,4 +12,4 @@ COPY . .
 
 RUN yarn run build-prod
 
-CMD [ "node", "build/index.js" ]
+CMD [ "pm2-runtime", "start", "pm2.json" ]

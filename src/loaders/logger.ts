@@ -22,6 +22,7 @@ function loadLogger(config: typeof Config): winston.Logger {
     level: config.logs.level,
     levels: winston.config.npm.levels,
     format: winston.format.combine(winston.format.errors({ stack: true }), winston.format.splat(), winston.format.json()),
+    defaultMeta: { instance: process.env.NODE_APP_INSTANCE },
     transports,
   });
 
