@@ -44,8 +44,8 @@ export class UserService {
           city: "surveys.city",
           school: "surveys.school",
         })
-        .join("surveys", "applications.userId", "surveys.applicantId")
-        .join("users", "applications.userId", "users.id"),
+        .fullOuterJoin("surveys", "applications.userId", "surveys.applicantId")
+        .fullOuterJoin("users", "applications.userId", "users.id"),
       this.db.grades().select("applicantId").avg({ cv: "cv", coverLetter: "coverLetter", essays: "essays", grades: "grades", recommendations: "recommendations", overall: "overall" }).groupBy("applicantId"),
     ]);
 
