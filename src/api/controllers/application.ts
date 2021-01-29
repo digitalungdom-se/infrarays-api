@@ -42,7 +42,7 @@ async function getPDF(req: Request, res: Response): Promise<void> {
 async function getFiles(req: Request, res: Response): Promise<void> {
   const userID = req.params.userID;
 
-  const files = await req.services.Storage.getForUser(userID);
+  const files = await req.services.Storage.getForApplicant(userID);
 
   const filesReturn = files.map(file => {
     return req.services.Storage.toFilePublic(file);

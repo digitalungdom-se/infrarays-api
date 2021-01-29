@@ -37,7 +37,7 @@ export class ApplicationService {
 
   public async getPDF(applicantID: string, opts?: { includeRecommendationLetters?: boolean }): Promise<Buffer> {
     const [files, userApplication, recommendations] = await Promise.all([
-      this.Storage.getForUser(applicantID),
+      this.Storage.getForApplicant(applicantID, { includeRecommendationLetters: opts?.includeRecommendationLetters }),
       this.db
         .applications()
         .select({

@@ -9,6 +9,7 @@ import { FileType } from "types";
 import database from "types/database";
 import { Config } from "configs";
 import { IFilePublic } from "interfaces/IStorage";
+import e from "express";
 
 export class StorageService {
   private readonly db: {
@@ -25,10 +26,12 @@ export class StorageService {
     return this.db.files().where({ id: fileID }).select("*").first();
   }
 
-  public async getForUser(userID: string): Promise<database.Files[]> {
-    const files = (await this.db.files().where({ userId: userID }).select("*")) as database.Files[];
-
-    return files;
+  public async getForApplicant(userID: string, opts?: { includeRecommendationLetters?: boolean }): Promise<database.Files[]> {
+    if (opts?.includeRecommendationLetters) {
+      return (await this.db.files().where({ userId: userID }).select("*")) as database.Files[];
+    } else {
+      return (await this.db.files().where({ userId: userID }).andWhereNot({ type: FileType.RecommendationLetter }).select("*")) as database.Files[];
+    }
   }
 
   public async create(userID: string, fileData: { name: string; path: string; mime: string; type: string; id?: string }): Promise<database.Files> {
@@ -52,9 +55,13 @@ export class StorageService {
       mime: fileData.mime,
     };
 
-    await this.db.files().where({ id: fileID }).del();
+    const exists = await this.db.files().where({ id: fileID }).select("*").first();
 
-    await this.db.files().insert(file);
+    if (!exists) {
+      await this.db.files().insert(file);
+    } else {
+      await this.db.files().where({ id: file.id }).update(file);
+    }
 
     return file;
   }

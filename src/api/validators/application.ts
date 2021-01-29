@@ -1,6 +1,7 @@
 import { body, param } from "express-validator";
 import { Request } from "express";
 import validator from "validator";
+import moment from "moment";
 
 import { validators, sanitizers } from "utils";
 import { FileType } from "types";
@@ -66,7 +67,7 @@ const uploadFile = [
       const req = meta.req as Request;
       const userID = req.user!.id;
 
-      const files = await req.services.Storage.getForUser(userID);
+      const files = await req.services.Storage.getForApplicant(userID);
 
       let appendixCount = 0;
 
@@ -131,8 +132,12 @@ const sendRecommendationRequest = [
       const recommendations = await req.services.Application.getRecommendationsForApplicant(userID);
 
       recommendations.forEach(recommendation => {
-        if (validator.normalizeEmail(recommendation.email) === validator.normalizeEmail(email) && recommendation.index !== +req.params.index) {
+        if (validator.normalizeEmail(recommendation.email) === validator.normalizeEmail(email) && recommendation.index !== +req.params.recommendationIndex) {
           throw new Error("Recommendation already sent to that email address.:APPLICATION-429:422");
+        }
+
+        if (recommendation.index === +req.params.recommendationIndex && moment.utc().diff(recommendation.lastSent, "minutes") < 60) {
+          throw new Error("Recommendation to that index is on a cooldown.:APPLICATION-430:422");
         }
       });
 
