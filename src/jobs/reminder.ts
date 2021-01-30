@@ -21,6 +21,15 @@ export function sendClosingReminderJob(when: When, userService: UserService, app
           try {
             const applicationPDF = await applicationService.getPDF(applicant.id);
 
+            if (when === When.Closed) {
+              await mailService.sendClosed(
+                applicant.email,
+                { first_name: applicant.firstName, last_name: applicant.lastName },
+                { content: applicationPDF.toString("base64"), filename: `${applicant.lastName.toLowerCase()}_${applicant.firstName.toLowerCase()}.pdf`.replace(/ /g, "_"), type: "application/pdf" },
+              );
+              return;
+            }
+
             let time = "";
 
             switch (when) {
@@ -33,15 +42,12 @@ export function sendClosingReminderJob(when: When, userService: UserService, app
               case When.OneDay:
                 time = "en dag";
                 break;
-              // case When.Closed:
-              //   time = "stäng";
-              //   break;
             }
 
             await mailService.sendClosingReminder(
               applicant.email,
               { first_name: applicant.firstName, last_name: applicant.lastName, time },
-              { content: applicationPDF.toString("base64"), filename: `${applicant.lastName.toLowerCase()}_${applicant.firstName.toLowerCase()}.pdf`, type: "application/pdf" },
+              { content: applicationPDF.toString("base64"), filename: `${applicant.lastName.toLowerCase()}_${applicant.firstName.toLowerCase()}.pdf`.replace(/ /g, "_"), type: "application/pdf" },
             );
           } catch (e) {
             logger.error(`Error sending application to user. ID: ${applicant.id} EMAIL: ${applicant.email} FIRST_NAME: ${applicant.firstName} LAST_NAME: ${applicant.lastName}`);

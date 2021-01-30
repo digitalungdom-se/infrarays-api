@@ -43,6 +43,7 @@ const Config = {
       recommendationReceivedApplicant: process.env.SEND_GRID_TEMPLATE_RECOMMENDATION_RECEIVED_APPLICANT!,
       recommendationReceivedSender: process.env.SEND_GRID_TEMPLATE_RECOMMENDATION_RECEIVED_SENDER!,
       closingReminder: process.env.SEND_GRID_TEMPLATE_CLOSING_REMINDER!,
+      closed: process.env.SEND_GRID_TEMPLATE_CLOSED!,
     },
   },
 };

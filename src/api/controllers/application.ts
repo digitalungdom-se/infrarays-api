@@ -32,7 +32,7 @@ async function getPDF(req: Request, res: Response): Promise<void> {
 
   const [applicationPDFBuffer, user] = await Promise.all([req.services.Application.getPDF(userID, { includeRecommendationLetters: isAdmin }), req.services.User.getByID(userID)]);
 
-  const fileName = `${user!.firstName.toLowerCase()}_${user!.lastName.toLowerCase()}.pdf`.replace(" ", "_");
+  const fileName = `${user!.firstName.toLowerCase()}_${user!.lastName.toLowerCase()}.pdf`.replace(/ /g, "_");
 
   res.set("Content-disposition", "inline; filename=" + fileName);
   res.contentType("application/pdf");

@@ -15,10 +15,10 @@ export function loadJobs(knex: knex, redis: RedisClient, sendGridMailService: Se
   const mailService = new MailService(sendGridMailService, config);
 
   if (process.env.NODE_APP_INSTANCE === "0" || !process.env.NODE_APP_INSTANCE) {
-    const oneWeekLeftDate = moment().month(2).date(25).hour(17).startOf("hour").tz("Europe/Stockholm").toDate();
-    const fourDaysLeft = moment().month(2).date(27).hour(17).startOf("hour").tz("Europe/Stockholm").toDate();
-    const oneDayLeftDate = moment().month(2).date(30).hour(8).startOf("hour").tz("Europe/Stockholm").toDate();
-    const closedDate = moment().month(3).date(1).hour(1).startOf("hour").tz("Europe/Stockholm").toDate();
+    const oneWeekLeftDate = moment().tz("Europe/Stockholm").month(2).date(25).hour(17).startOf("hour").toDate();
+    const fourDaysLeft = moment().tz("Europe/Stockholm").month(2).date(27).hour(17).startOf("hour").toDate();
+    const oneDayLeftDate = moment().tz("Europe/Stockholm").month(2).date(30).hour(8).startOf("hour").toDate();
+    const closedDate = moment().tz("Europe/Stockholm").month(3).date(1).hour(1).startOf("hour").toDate();
 
     logger.info(`Scheduling closing reminder job for ${oneWeekLeftDate.toString()} (${When.Week})`);
     nodeSchedule.scheduleJob(oneWeekLeftDate, sendClosingReminderJob(When.Week, services.User, services.Application, mailService, logger));
