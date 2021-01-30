@@ -21,7 +21,7 @@ function loadLogger(config: typeof Config): winston.Logger {
   const logger = winston.createLogger({
     level: config.logs.level,
     levels: winston.config.npm.levels,
-    format: winston.format.combine(winston.format.errors({ stack: true }), winston.format.splat(), winston.format.json()),
+    format: winston.format.combine(winston.format.errors({ stack: true }), winston.format.splat(), winston.format.json(), winston.format.timestamp()),
     defaultMeta: { instance: process.env.NODE_APP_INSTANCE },
     transports,
   });

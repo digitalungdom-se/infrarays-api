@@ -71,9 +71,9 @@ class App {
     this.app.use(httpLogger(this.logger));
 
     if (this.config.environment.production) {
-      this.app.use(cors({ origin: "https://ansok.raysforexcellence.se" }));
+      this.app.use(cors({ origin: "https://ansok.raysforexcellence.se", exposedHeaders: ["Content-Disposition"] }));
     } else {
-      this.app.use(cors());
+      this.app.use(cors({ exposedHeaders: ["Content-Disposition"] }));
     }
 
     this.app.use(helmet());
