@@ -1,11 +1,27 @@
 import winston from "winston";
 import expressWinston from "express-winston";
 import express from "express";
+import "winston-daily-rotate-file";
+import fs from "fs-extra";
 
 import { Config } from "configs";
 
 function loadLogger(config: typeof Config): winston.Logger {
   const transports = [];
+
+  if (fs.readFileSync("/proc/self/cgroup", "utf8").includes("docker") || fs.pathExistsSync("/.dockerenv")) {
+    transports.push(
+      new winston.transports.DailyRotateFile({
+        filename: "infrarays-api-%DATE%.log",
+        datePattern: "YYYY-MM-DD-HH",
+        zippedArchive: false,
+        maxSize: "20m",
+        utc: true,
+        createSymlink: true,
+        dirname: "/var/log/infrarays-api",
+      }),
+    );
+  }
 
   if (!config.isDevelopment) {
     transports.push(new winston.transports.Console());
@@ -21,7 +37,7 @@ function loadLogger(config: typeof Config): winston.Logger {
   const logger = winston.createLogger({
     level: config.logs.level,
     levels: winston.config.npm.levels,
-    format: winston.format.combine(winston.format.errors({ stack: true }), winston.format.splat(), winston.format.json(), winston.format.timestamp()),
+    format: winston.format.combine(winston.format.timestamp(), winston.format.errors({ stack: true }), winston.format.splat(), winston.format.json()),
     defaultMeta: { instance: process.env.NODE_APP_INSTANCE },
     transports,
   });
