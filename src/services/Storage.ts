@@ -9,7 +9,6 @@ import { FileType } from "types";
 import database from "types/database";
 import { Config } from "configs";
 import { IFilePublic } from "interfaces/IStorage";
-import e from "express";
 
 export class StorageService {
   private readonly db: {

@@ -136,7 +136,7 @@ const sendRecommendationRequest = [
           throw new Error("Recommendation already sent to that email address.:APPLICATION-429:422");
         }
 
-        if (recommendation.index === +req.params.recommendationIndex && moment.utc().diff(recommendation.lastSent, "minutes") < 60) {
+        if (recommendation.index === +req.params.recommendationIndex && moment.utc().diff(recommendation.lastSent, "hours") < 24) {
           throw new Error("Recommendation to that index is on a cooldown.:APPLICATION-430:422");
         }
       });
