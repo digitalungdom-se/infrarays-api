@@ -19,7 +19,7 @@ export class MailService {
     await this.sendGridMail.send(msg);
   }
 
-  public async sendLoginEmail(to: string, data: { login_code: string }): Promise<void> {
+  public async sendLoginEmail(to: string, data: { login_code: string; authorization_token: string }): Promise<void> {
     await this.sendEmail(to, this.config.sendGrid.emailTemplates.login, data);
   }
 

@@ -50,7 +50,9 @@ export class AuthenticationService {
 
     const emailLoginCode = await this.Token.createEmailLoginToken(user.id);
 
-    await this.Mail.sendLoginEmail(email, { login_code: emailLoginCode });
+    const authorisationToken = Buffer.from(`${email}:${emailLoginCode}`).toString("base64");
+
+    await this.Mail.sendLoginEmail(email, { login_code: emailLoginCode, authorization_token: authorisationToken });
 
     return emailLoginCode;
   }
