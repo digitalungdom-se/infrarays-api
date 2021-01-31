@@ -13,9 +13,9 @@ function loadLogger(config: typeof Config): winston.Logger {
     transports.push(
       new winston.transports.DailyRotateFile({
         filename: "infrarays-api-%DATE%.log",
+        frequency: "24h",
         datePattern: "YYYY-MM-DD-HH",
         zippedArchive: false,
-        maxSize: "20m",
         utc: true,
         createSymlink: true,
         dirname: "/var/log/infrarays-api",
