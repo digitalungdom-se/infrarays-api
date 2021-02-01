@@ -1,4 +1,5 @@
 import { RedisClient } from "redis";
+import hasha from "hasha";
 
 import { TokenType } from "types";
 import { timeConversion, randomBase62String, randomBase58String, randomWordArray } from "utils";
@@ -11,6 +12,8 @@ export class TokenService {
       key = `${opts.prefix}:${key}`;
     }
 
+    key = await hasha.async(key, { encoding: "base64" });
+
     if (opts?.ex) {
       await this.redis.setexAsync(key, opts.ex, value);
     } else {
@@ -22,6 +25,8 @@ export class TokenService {
     if (opts?.prefix) {
       key = `${opts.prefix}:${key}`;
     }
+
+    key = await hasha.async(key, { encoding: "base64" });
 
     const value = this.redis.getAsync(key);
 
@@ -36,6 +41,8 @@ export class TokenService {
     if (prefix) {
       key = `${prefix}:${key}`;
     }
+
+    key = await hasha.async(key, { encoding: "base64" });
 
     await this.redis.delAsync(key);
   }
