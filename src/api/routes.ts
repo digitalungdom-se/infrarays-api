@@ -34,21 +34,21 @@ r.get("/user/:userID").ensureAuth().validator(validators.user.getByID).controlle
 r.patch("/user/:userID").ensureAuth().validator(validators.user.update).controller(controllers.user.update);
 
 // Application
-r.post("/application").validator(validators.application.createApplicant).controller(controllers.application.createApplicant);
+r.post("/application").lock().validator(validators.application.createApplicant).controller(controllers.application.createApplicant);
 r.get("/application/:userID").ensureAuth().validator(validators.application.get).controller(controllers.application.get);
 r.get("/application/:userID/pdf").ensureAuth().validator(validators.application.getPDF).controller(controllers.application.getPDF);
 
 r.get("/application/:userID/file").ensureAuth().validator(validators.application.getFiles).controller(controllers.application.getFiles);
-r.post("/application/:userID/file/:fileType").ensureAuth().file("file").validator(validators.application.uploadFile).controller(controllers.application.uploadFile);
+r.post("/application/:userID/file/:fileType").lock().ensureAuth().file("file").validator(validators.application.uploadFile).controller(controllers.application.uploadFile);
 r.get("/application/:userID/file/:fileID").ensureAuth().validator(validators.application.getFile).controller(controllers.application.getFile);
-r.delete("/application/:userID/file/:fileID").ensureAuth().validator(validators.application.deleteFile).controller(controllers.application.deleteFile);
+r.delete("/application/:userID/file/:fileID").lock().ensureAuth().validator(validators.application.deleteFile).controller(controllers.application.deleteFile);
 
 r.get("/application/:userID/survey").ensureAuth().validator(validators.application.getSurvey).controller(controllers.application.getSurvey);
-r.post("/application/:userID/survey").ensureAuth().validator(validators.application.saveSurvey).controller(controllers.application.saveSurvey);
+r.post("/application/:userID/survey").lock().ensureAuth().validator(validators.application.saveSurvey).controller(controllers.application.saveSurvey);
 
 r.get("/application/:userID/recommendation").ensureAuth().controller(controllers.application.getRecommendations);
-r.post("/application/:userID/recommendation/:recommendationIndex").ensureAuth().validator(validators.application.sendRecommendationRequest).controller(controllers.application.sendRecommendationRequest);
-r.delete("/application/:userID/recommendation/:recommendationIndex").ensureAuth().validator(validators.application.deleteRecommendation).controller(controllers.application.deleteRecommendation);
+r.post("/application/:userID/recommendation/:recommendationIndex").lock().ensureAuth().validator(validators.application.sendRecommendationRequest).controller(controllers.application.sendRecommendationRequest);
+r.delete("/application/:userID/recommendation/:recommendationIndex").lock().ensureAuth().validator(validators.application.deleteRecommendation).controller(controllers.application.deleteRecommendation);
 
 r.get("/application/recommendation/:recommendationCode").validator(validators.application.getRecommendationByCode).controller(controllers.application.getRecommendationByCode);
 r.post("/application/recommendation/:recommendationCode").file("file").validator(validators.application.uploadRecommendation).controller(controllers.application.uploadRecommendation);
