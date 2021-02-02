@@ -107,9 +107,9 @@ export class ApplicationService {
     const pages = [];
 
     const introDoc = await PDFDocument.create();
-    const timesRoman = {
-      normal: await introDoc.embedFont(StandardFonts.TimesRoman),
-      bold: await introDoc.embedFont(StandardFonts.TimesRomanBold),
+    const helvetica = {
+      normal: await introDoc.embedFont(StandardFonts.Helvetica),
+      bold: await introDoc.embedFont(StandardFonts.Helvetica),
     };
 
     const introPage = introDoc.addPage(PageSizes.A4);
@@ -124,10 +124,10 @@ export class ApplicationService {
     const fontSizes = { title: 30, text: 16 };
 
     introPage.drawText("RAYS APPLICATION", {
-      x: (pageDimensions.width - timesRoman.normal.widthOfTextAtSize("RAYS APPLICATION", fontSizes.title)) / 2,
+      x: (pageDimensions.width - helvetica.normal.widthOfTextAtSize("RAYS APPLICATION", fontSizes.title)) / 2,
       y: pageDimensions.height - fontSizes.title * 2,
       size: fontSizes.title,
-      font: timesRoman.normal,
+      font: helvetica.normal,
       color: rgb(0, 0, 0),
     });
 
@@ -139,15 +139,15 @@ export class ApplicationService {
         x: 20,
         y: pageDimensions.height - (100 + (fontSizes.text + 3) * index),
         size: fontSizes.text,
-        font: timesRoman.bold,
+        font: helvetica.bold,
         color: rgb(0, 0, 0),
       });
 
       introPage.drawText(value, {
-        x: 20 + 5 + timesRoman.bold.widthOfTextAtSize(title, fontSizes.text),
+        x: 20 + 5 + helvetica.bold.widthOfTextAtSize(title, fontSizes.text),
         y: pageDimensions.height - (100 + (fontSizes.text + 3) * index),
         size: fontSizes.text,
-        font: timesRoman.normal,
+        font: helvetica.normal,
         color: rgb(0, 0, 0),
       });
 
