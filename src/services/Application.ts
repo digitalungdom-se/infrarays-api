@@ -109,7 +109,7 @@ export class ApplicationService {
     const introDoc = await PDFDocument.create();
     const helvetica = {
       normal: await introDoc.embedFont(StandardFonts.Helvetica),
-      bold: await introDoc.embedFont(StandardFonts.Helvetica),
+      bold: await introDoc.embedFont(StandardFonts.HelveticaBold),
     };
 
     const introPage = introDoc.addPage(PageSizes.A4);
