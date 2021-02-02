@@ -167,10 +167,10 @@ export class ApplicationService {
     createSubTitles("Recommendation letter from:", recommendationEmails[2]);
 
     introPage.drawText("Utvecklat av Digital Ungdom", {
-      x: (pageDimensions.width - timesRoman.normal.widthOfTextAtSize("Utvecklat av Digital Ungdom", 12)) / 2,
+      x: (pageDimensions.width - helvetica.normal.widthOfTextAtSize("Utvecklat av Digital Ungdom", 12)) / 2,
       y: 25,
       size: 12,
-      font: timesRoman.normal,
+      font: helvetica.normal,
       color: rgb(0, 0, 0),
     });
 
