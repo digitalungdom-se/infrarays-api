@@ -12,6 +12,7 @@ const createApplicant = [
   body("email")
     .isString()
     .isEmail()
+    .normalizeEmail()
     .bail()
     .custom(async function (email: string, meta) {
       const req = meta.req as Request;
@@ -123,6 +124,7 @@ const sendRecommendationRequest = [
   body("email")
     .isString()
     .isEmail()
+    .normalizeEmail()
     .bail()
     .custom(async function (email: string, meta) {
       const req = meta.req as Request;
