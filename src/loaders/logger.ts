@@ -19,17 +19,26 @@ function loadLogger(config: typeof Config): winston.Logger {
         utc: true,
         createSymlink: true,
         dirname: "/var/log/infrarays-api",
+        format: winston.format.combine(winston.format.timestamp(), winston.format.errors({ stack: true }), winston.format.splat(), winston.format.json()),
       }),
     );
   }
 
   if (!config.isDevelopment) {
-    transports.push(new winston.transports.Console());
+    transports.push(
+      new winston.transports.Console({
+        format: winston.format.combine(
+          winston.format.timestamp(),
+          winston.format.cli(),
+          winston.format.printf(info => `${info.level} (@${info.timestamp} on ${info.instance}): ${info.message}`),
+        ),
+      }),
+    );
   } else {
     // dev and test
     transports.push(
       new winston.transports.Console({
-        format: winston.format.combine(winston.format.prettyPrint()),
+        format: winston.format.combine(winston.format.timestamp(), winston.format.errors({ stack: true }), winston.format.splat(), winston.format.json(), winston.format.prettyPrint()),
       }),
     );
   }
@@ -37,7 +46,6 @@ function loadLogger(config: typeof Config): winston.Logger {
   const logger = winston.createLogger({
     level: config.logs.level,
     levels: winston.config.npm.levels,
-    format: winston.format.combine(winston.format.timestamp(), winston.format.errors({ stack: true }), winston.format.splat(), winston.format.json()),
     defaultMeta: { instance: process.env.NODE_APP_INSTANCE },
     transports,
   });

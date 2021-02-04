@@ -22,10 +22,7 @@ async function newToken(req: Request, res: Response): Promise<void> {
       case "Email":
         // eslint-disable-next-line prefer-const
         let [email, code] = Buffer.from(authValue, "base64").toString("ascii").split(":");
-
-        if (validator.isEmail(email)) {
-          email = validator.normalizeEmail(email) as string;
-        }
+        email = validator.normalizeEmail(email) || email;
 
         responseToken = await req.services.Authentication.loginWithEmailCode(email, code);
         break;
