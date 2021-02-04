@@ -1,6 +1,8 @@
 /* eslint-disable no-case-declarations */
 import { Request, Response } from "express";
 
+import validator from "validator";
+
 async function newToken(req: Request, res: Response): Promise<void> {
   let responseToken;
 
@@ -18,7 +20,12 @@ async function newToken(req: Request, res: Response): Promise<void> {
 
     switch (method) {
       case "Email":
-        const [email, code] = Buffer.from(authValue, "base64").toString("ascii").split(":");
+        // eslint-disable-next-line prefer-const
+        let [email, code] = Buffer.from(authValue, "base64").toString("ascii").split(":");
+
+        if (validator.isEmail(email)) {
+          email = validator.normalizeEmail(email) as string;
+        }
 
         responseToken = await req.services.Authentication.loginWithEmailCode(email, code);
         break;
