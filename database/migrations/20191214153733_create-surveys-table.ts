@@ -12,8 +12,8 @@ export async function up(knex: Knex): Promise<any> {
     table.specificType("application_portal", "smallint").unsigned().notNullable();
     table.specificType("application_process", "smallint").unsigned().notNullable();
 
-    table.string("improvement").notNullable();
-    table.string("informant").notNullable();
+    table.string("improvement", 8192).notNullable();
+    table.string("informant", 8192).notNullable();
 
     table.dateTime("created").notNullable();
   });

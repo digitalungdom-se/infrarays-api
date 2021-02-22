@@ -17,7 +17,7 @@ export async function up(knex: Knex): Promise<any> {
     table.specificType("recommendations", "smallint").unsigned().notNullable();
     table.specificType("overall", "smallint").unsigned().notNullable();
 
-    table.string("comment").nullable();
+    table.string("comment", 8192).nullable();
 
     table.unique(["admin_id", "applicant_id"]);
   });
