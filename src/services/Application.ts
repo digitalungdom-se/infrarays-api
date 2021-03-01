@@ -52,6 +52,7 @@ export class ApplicationService {
 
           city: "surveys.city",
           school: "surveys.school",
+          surveyCreated: "surveys.created",
         })
         .where("applications.userId", applicantID)
         .fullOuterJoin("surveys", "applications.userId", "surveys.applicantId")
@@ -65,7 +66,7 @@ export class ApplicationService {
         .map(file => {
           return file.created.valueOf().toString();
         })
-        .join(),
+        .join() + userApplication.surveyCreated?.valueOf().toString(),
       { encoding: "base64" },
     );
 
