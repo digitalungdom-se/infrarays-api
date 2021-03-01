@@ -47,6 +47,8 @@ describe("User", function () {
       const response = await u.get("/application/@me/pdf");
 
       expect(response.status).toBe(200);
+
+      console.log(u.email);
     });
   });
 

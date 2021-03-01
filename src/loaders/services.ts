@@ -15,7 +15,7 @@ function loadServices(knex: knex, redis: RedisClient, sendGridMailService: SendG
 
   const services: IServices = {
     Authentication: new AuthenticationService(tokenService, userService, mailService, config),
-    Application: new ApplicationService(knex, userService, storageService, mailService, config),
+    Application: new ApplicationService(knex, userService, storageService, mailService, tokenService, config),
     Admin: new AdminService(knex, userService),
     User: userService,
     Storage: storageService,

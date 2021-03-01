@@ -70,7 +70,24 @@ export class TokenService {
 
     return value;
   }
+
   public async getEmailLoginToken(token: string): Promise<string | null> {
     return this.get(token, { prefix: TokenType.EmailLogin, delete: true });
+  }
+
+  public async getCachedApplicationPDFToken(userID: string): Promise<string | null> {
+    return this.get(userID, { prefix: TokenType.CachedApplicationPDF });
+  }
+
+  public async createCachedApplicationPDFToken(userID: string, datesHash: string): Promise<void> {
+    await this.set(userID, datesHash, { prefix: TokenType.CachedApplicationPDF });
+  }
+
+  public async getCachedCompleteApplicationPDFToken(applicantID: string): Promise<string | null> {
+    return this.get(applicantID, { prefix: TokenType.CachedCompleteApplicationPDF });
+  }
+
+  public async createCachedCompleteApplicationPDFToken(applicantID: string, datesHash: string): Promise<void> {
+    await this.set(applicantID, datesHash, { prefix: TokenType.CachedCompleteApplicationPDF });
   }
 }

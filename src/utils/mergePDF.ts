@@ -1,6 +1,6 @@
 import { PDFDocument } from "pdf-lib";
 
-export async function mergePDFDocuments(documents: Array<Buffer | PDFDocument>): Promise<Uint8Array> {
+export async function mergePDFDocuments(documents: Array<Buffer | PDFDocument>): Promise<PDFDocument> {
   const mergedPdf = await PDFDocument.create();
 
   for (let document of documents) {
@@ -12,5 +12,5 @@ export async function mergePDFDocuments(documents: Array<Buffer | PDFDocument>):
     copiedPages.forEach(page => mergedPdf.addPage(page));
   }
 
-  return await mergedPdf.save();
+  return mergedPdf;
 }

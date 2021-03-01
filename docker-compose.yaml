@@ -17,6 +17,7 @@ services:
       - psql
       - redis
     env_file: .docker.env
+    restart: "no"
     # volumes:
     # - infrarays-api-data:/store
 
@@ -34,6 +35,7 @@ services:
       - POSTGRES_USER=infrarays
       - POSTGRES_PASSWORD=infrarays_is_the_best
       - POSTGRES_DB=infrarays
+    restart: "no"
     # volumes:
     # - psql-data:/var/lib/postgresql/data/
 
@@ -48,6 +50,7 @@ services:
       - 6379
     ports:
       - "6379:6379"
+    restart: "no"
     # volumes:
     # - redis-data:/data
 

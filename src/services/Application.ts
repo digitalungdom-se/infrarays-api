@@ -5,11 +5,12 @@ import fs from "fs-extra";
 import moment from "moment";
 import pdfParse from "pdf-parse";
 import { v4 as uuidv4 } from "uuid";
+import hasha from "hasha";
 
 import database from "types/database";
 import { IApplicantInput, ISurveyInput, IRecommendationByCode, IRecommendationForUser } from "interfaces";
-import { UserService, StorageService, MailService } from "./";
-import { FileType, UserType } from "types";
+import { UserService, StorageService, TokenService, MailService } from "./";
+import { FileName, FileType, UserType } from "types";
 import { mergePDFDocuments, randomBase62String } from "utils";
 import { Config } from "configs";
 
@@ -23,7 +24,7 @@ export class ApplicationService {
     surveys(): knex.QueryBuilder<database.Surveys>;
   };
 
-  constructor(private readonly knex: knex, private readonly User: UserService, private readonly Storage: StorageService, private readonly Mail: MailService, private readonly config: typeof Config) {
+  constructor(private readonly knex: knex, private readonly User: UserService, private readonly Storage: StorageService, private readonly Mail: MailService, private readonly Token: TokenService, private readonly config: typeof Config) {
     this.db = {
       applications: (): knex.QueryBuilder<database.Applications> => this.knex<database.Applications>("applications"),
       recommendations: (): knex.QueryBuilder<database.Recommendations> => this.knex<database.Recommendations>("recommendations"),
@@ -36,8 +37,8 @@ export class ApplicationService {
   }
 
   public async getPDF(applicantID: string, opts?: { includeRecommendationLetters?: boolean }): Promise<Buffer> {
-    const [files, userApplication, recommendations] = await Promise.all([
-      this.Storage.getForApplicant(applicantID, { includeRecommendationLetters: opts?.includeRecommendationLetters }),
+    const [allFiles, userApplication, recommendations] = await Promise.all([
+      this.Storage.getForApplicant(applicantID, { includeRecommendationLetters: true }),
       this.db
         .applications()
         .select({
@@ -58,6 +59,37 @@ export class ApplicationService {
         .first(),
       this.db.recommendations().where({ applicantId: applicantID }).select("*"),
     ]);
+
+    const datesHash = await hasha.async(
+      allFiles
+        .map(file => {
+          return file.created.valueOf().toString();
+        })
+        .join(),
+      { encoding: "base64" },
+    );
+
+    const cachedFileName = opts?.includeRecommendationLetters ? FileName.CachedCompleteApplicationPDF : FileName.CachedApplicationPDF;
+    const cachedFilePath = path.join(this.config.server.store, applicantID, cachedFileName);
+
+    let prevDatesHash;
+    if (opts?.includeRecommendationLetters) {
+      prevDatesHash = await this.Token.getCachedCompleteApplicationPDFToken(applicantID);
+    } else {
+      prevDatesHash = await this.Token.getCachedApplicationPDFToken(applicantID);
+    }
+
+    if (prevDatesHash === datesHash) {
+      return fs.readFile(cachedFilePath);
+    }
+
+    const files = allFiles.filter(file => {
+      if (file.type === FileType.RecommendationLetter && !opts?.includeRecommendationLetters) {
+        return false;
+      }
+
+      return true;
+    });
 
     const recommendationEmails = (recommendations as database.Recommendations[]).map(recommendation => {
       if (recommendation.received) {
@@ -189,13 +221,22 @@ export class ApplicationService {
       pages.push(fileObject[FileType.Grades]);
     }
 
+    pages.push(...fileObject[FileType.Appendix]);
+
     if (opts?.includeRecommendationLetters) {
       pages.push(...fileObject[FileType.RecommendationLetter]);
     }
 
-    pages.push(...fileObject[FileType.Appendix]);
+    const applicationBuffer = Buffer.from(await (await mergePDFDocuments(pages)).save());
+    await fs.outputFile(cachedFilePath, applicationBuffer);
 
-    return Buffer.from(await mergePDFDocuments(pages));
+    if (opts?.includeRecommendationLetters) {
+      await this.Token.createCachedCompleteApplicationPDFToken(applicantID, datesHash);
+    } else {
+      await this.Token.createCachedApplicationPDFToken(applicantID, datesHash);
+    }
+
+    return applicationBuffer;
   }
 
   public async create(applicantData: IApplicantInput): Promise<database.Users> {
