@@ -6,9 +6,12 @@ import _ from "lodash";
 import database from "types/database";
 import { UserService } from ".";
 import { IAdminInput, IGradeInput } from "interfaces/IAdmin";
+import { FileType } from "types";
 
 export class AdminService {
   private readonly db: {
+    applications(): knex.QueryBuilder<database.Applications>;
+    files(): knex.QueryBuilder<database.Files>;
     grades(): knex.QueryBuilder<database.Grades>;
     gradingOrders(): knex.QueryBuilder<database.GradingOrders>;
     surveys(): knex.QueryBuilder<database.Surveys>;
@@ -20,6 +23,8 @@ export class AdminService {
 
   constructor(private readonly knex: knex, private readonly User: UserService) {
     this.db = {
+      applications: (): knex.QueryBuilder<database.Applications> => this.knex<database.Applications>("applications"),
+      files: (): knex.QueryBuilder<database.Files> => this.knex<database.Files>("files"),
       grades: (): knex.QueryBuilder<database.Grades> => this.knex<database.Grades>("grades"),
       gradingOrders: (): knex.QueryBuilder<database.GradingOrders> => this.knex<database.GradingOrders>("grading_orders"),
       surveys: (): knex.QueryBuilder<database.Surveys> => this.knex<database.Surveys>("surveys"),
@@ -60,11 +65,32 @@ export class AdminService {
 
   async randomiseGradingOrder(adminID: string): Promise<database.GradingOrders[]> {
     // eslint-disable-next-line prefer-const
-    let [applicants, grades] = await Promise.all([this.User.getUsers(true), this.db.grades().select("*").where({ adminId: adminID }), this.db.gradingOrders().where({ adminId: adminID }).del()]);
+    let [applicants, grades] = await Promise.all([
+      this.db
+        .files()
+        .select({
+          id: "applications.userId",
+          email: "users.email",
+          firstName: "users.firstName",
+          lastName: "users.lastName",
+
+          finnish: "applications.finnish",
+          birthdate: "applications.birthdate",
+
+          city: "surveys.city",
+          school: "surveys.school",
+        })
+        .where("files.type", FileType.CV)
+        .fullOuterJoin("applications", "files.userId", "applications.userId")
+        .fullOuterJoin("surveys", "files.userId", "surveys.applicantId")
+        .fullOuterJoin("users", "files.userId", "users.id"),
+      this.db.grades().select("*").where({ adminId: adminID }),
+      this.db.gradingOrders().where({ adminId: adminID }).del(),
+    ]);
 
     applicants = _.shuffle(applicants);
 
-    const gradingOrder = applicants.map((applicant, index) => {
+    const gradingOrder = applicants.map((applicant: any, index: number) => {
       return {
         id: uuidv4(),
         adminId: adminID,
@@ -81,7 +107,7 @@ export class AdminService {
       gradesMap.set(grade.applicantId, grade);
     });
 
-    return gradingOrder.map(order => {
+    return gradingOrder.map((order: any) => {
       return {
         ...order,
         done: gradesMap.has(order.applicantId),

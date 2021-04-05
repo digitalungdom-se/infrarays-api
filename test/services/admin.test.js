@@ -140,7 +140,6 @@ describe("Admin", function () {
 
       const response = await admin.post("/admin/grading/randomise");
       expect(response.status).toBe(200);
-      expect(response.body.length).toBeGreaterThanOrEqual(applicants.length);
       expect(response.body[0].id).toBeDefined();
       expect(response.body[0].adminId).toBeDefined();
       expect(response.body[0].applicantId).toBeDefined();
@@ -154,6 +153,8 @@ describe("Admin", function () {
       const p = new Profile(request);
       const admin = await p.createAdmin();
       const applicants = await Promise.all([p.createApplicant(), p.createApplicant(), p.createApplicant()]);
+
+      await request.post("/application/@me/file/cv").set("Authorization", `Bearer ${applicants[0].accessToken}`).attach("file", "test/assets/004mb.pdf");
 
       const grade = {
         cv: Math.floor(Math.random() * 5) + 1,
@@ -169,7 +170,6 @@ describe("Admin", function () {
       await admin.post("/admin/grading/randomise");
       const response = await admin.get("/admin/grading");
       expect(response.status).toBe(200);
-      expect(response.body.length).toBeGreaterThanOrEqual(applicants.length);
       expect(response.body[0].id).toBeDefined();
       expect(response.body[0].adminId).toBeDefined();
       expect(response.body[0].applicantId).toBeDefined();

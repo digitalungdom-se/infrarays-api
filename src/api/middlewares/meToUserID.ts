@@ -14,11 +14,17 @@ export async function meToUserID(req: Request, _: Response, next: NextFunction):
       } else {
         // if it is not @me (thus uuid) make sure that the requester is authorized (admin/superAdmin)
         if (req.user.type === UserType.Admin || req.user.type === UserType.SuperAdmin) {
-          return next();
-          // FIX: only allow admins to GET/OPTION application routes
-          // if (["GET", "OPTION"].includes(req.method) || req.user.type === UserType.SuperAdmin) {
-          //   return next();
-          // }
+          // only allow Super Admins to make database updating requests
+
+          if (req.route.path === "/application/:userID/grade" || ["GET", "OPTION"].includes(req.method) || req.user.type === UserType.SuperAdmin) {
+            return next();
+          } else {
+            const err: Express.RequestError = new Error("UNAUTHORISED");
+            err.statusCode = 401;
+            err.errors = [{ message: "Regular admins can only use GET/OPTION methods.", code: "AUTH-006", param: "Authorization" }];
+
+            return next(err);
+          }
         }
       }
     }
