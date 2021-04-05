@@ -69,21 +69,9 @@ export class AdminService {
       this.db
         .files()
         .select({
-          id: "applications.userId",
-          email: "users.email",
-          firstName: "users.firstName",
-          lastName: "users.lastName",
-
-          finnish: "applications.finnish",
-          birthdate: "applications.birthdate",
-
-          city: "surveys.city",
-          school: "surveys.school",
+          id: "files.userId",
         })
-        .where("files.type", FileType.CV)
-        .fullOuterJoin("applications", "files.userId", "applications.userId")
-        .fullOuterJoin("surveys", "files.userId", "surveys.applicantId")
-        .fullOuterJoin("users", "files.userId", "users.id"),
+        .where("files.type", FileType.CV),
       this.db.grades().select("*").where({ adminId: adminID }),
       this.db.gradingOrders().where({ adminId: adminID }).del(),
     ]);
