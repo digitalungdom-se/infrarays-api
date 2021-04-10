@@ -66,9 +66,9 @@ const uploadFile = [
     .bail()
     .custom(async function (fileType: string, meta) {
       const req = meta.req as Request;
-      const userID = req.user!.id;
+      const applicantID = req.params.userID;
 
-      const files = await req.services.Storage.getForApplicant(userID);
+      const files = await req.services.Storage.getForApplicant(applicantID);
 
       let appendixCount = 0;
 

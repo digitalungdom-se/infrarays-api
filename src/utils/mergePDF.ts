@@ -5,7 +5,7 @@ export async function mergePDFDocuments(documents: Array<Buffer | PDFDocument>):
 
   for (let document of documents) {
     if (Buffer.isBuffer(document)) {
-      document = await PDFDocument.load(document);
+      document = await PDFDocument.load(document, { ignoreEncryption: true });
     }
 
     const copiedPages = await mergedPdf.copyPages(document, document.getPageIndices());
