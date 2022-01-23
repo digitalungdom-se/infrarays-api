@@ -56,8 +56,8 @@ class Route {
   }
 
   public lock(): Route {
-    const start = moment.utc().month(1).startOf("month");
-    const close = moment.utc().month(2).endOf("month");
+    const start = moment.utc().month(0).startOf("month");
+    const close = moment.utc().month(2).endOf("month").add(12, "hours");
 
     this.controllers.push(lock(start, close));
 

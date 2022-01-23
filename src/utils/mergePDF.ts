@@ -20,10 +20,10 @@ export async function mergePDFDocuments(documents: Array<Buffer | PDFDocument>):
         errorPage.drawText("ERROR LOADING THIS DOCUMENT!", {
           x: 50,
           y: pageDimensions.height / 2,
-          size: 50,
+          size: 35,
           font: helvetica.bold,
           color: rgb(0.95, 0.1, 0.1),
-          rotate: degrees(-45),
+          rotate: degrees(0),
         });
       }
     }
