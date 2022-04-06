@@ -1,9 +1,17 @@
-import { Request, Response, NextFunction, RequestHandler, Router as ExpressRouter } from "express";
+import { NextFunction, Request, RequestHandler, Response, Router as ExpressRouter } from "express";
 import { ValidationChain } from "express-validator";
 import moment from "moment";
 import multer from "multer";
 
-import { meToUserID, ensureAuthenticated, ensureApplicantAuthenticated, ensureAdminAuthenticated, ensureSuperAdminAuthenticated, lock, validate } from "./middlewares";
+import {
+  ensureAdminAuthenticated,
+  ensureApplicantAuthenticated,
+  ensureAuthenticated,
+  ensureSuperAdminAuthenticated,
+  lock,
+  meToUserID,
+  validate,
+} from "./middlewares";
 
 enum MethodTypes {
   get = "GET",
@@ -57,7 +65,7 @@ class Route {
 
   public lock(): Route {
     const start = moment.utc().month(0).startOf("month");
-    const close = moment.utc().month(2).endOf("month").add(12, "hours");
+    const close = moment.utc().month(3).endOf("month").add(12, "hours");
 
     this.controllers.push(lock(start, close));
 
